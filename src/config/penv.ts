@@ -15,11 +15,12 @@ export const penv = {
         environment: environement
     },
     db: {
-        mysqlHost: process.env.MYSQL_HOST,
-        mysqlPort: Number(process.env.MYSQL_PORT) || undefined,
-        mysqlDb: `${environement}db`,
-        mysqlUser: process.env.MYSQL_USER,
-        mysqlPw: process.env.MYSQL_PASSWORD
+        pgHost: process.env.PG_HOST,
+        pgPort: Number(process.env.PG_PORT) || undefined,
+        pgDb: `${environement}db`,
+        pgUser: process.env.PG_USER,
+        pgPw: process.env.PG_PASSWORD,
+        pgSchema: "spine" // static name for initializing (if change => also change in database/createInitialTables.sql)
     },
     auth: {
         jwtAuthkey: process.env.JWT_AUTHKEY

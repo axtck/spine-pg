@@ -1,38 +1,37 @@
-import mysql, { Connection, Pool } from "mysql2/promise";
+import { Client, Pool } from "pg";
 import { penv } from "../../config/penv";
 
-export const createNoDatabaseSelectedConnection = async (): Promise<Connection> => {
+export const createNoDatabaseSelectedClient = (): Client => {
     // don't specify database
-    const connection: Connection = await mysql.createConnection({
-        host: penv.db.mysqlHost,
-        port: penv.db.mysqlPort,
-        user: penv.db.mysqlUser,
-        password: penv.db.mysqlPw
+    const client: Client = new Client({
+        host: penv.db.pgHost,
+        port: penv.db.pgPort,
+        user: penv.db.pgUser,
+        password: penv.db.pgPw
     });
-    return connection;
+    return client;
 };
 
-export const createMultipleStatementsConnection = async (): Promise<Connection> => {
+export const createMultipleStatementsClient = (): Client => {
     // specify database and allow multiple statements for initialization
-    const connection: Connection = await mysql.createConnection({
-        host: penv.db.mysqlHost,
-        port: penv.db.mysqlPort,
-        user: penv.db.mysqlUser,
-        password: penv.db.mysqlPw,
-        database: penv.db.mysqlDb,
-        multipleStatements: true
+    const client: Client = new Client({
+        host: penv.db.pgHost,
+        port: penv.db.pgPort,
+        user: penv.db.pgUser,
+        password: penv.db.pgPw,
+        database: penv.db.pgDb
     });
-    return connection;
+    return client;
 };
 
 export const createPoolConnection = (): Pool => {
     // pool
-    const pool: Pool = mysql.createPool({
-        host: penv.db.mysqlHost,
-        port: penv.db.mysqlPort,
-        user: penv.db.mysqlUser,
-        password: penv.db.mysqlPw,
-        database: penv.db.mysqlDb
+    const pool: Pool = new Pool({
+        host: penv.db.pgHost,
+        port: penv.db.pgPort,
+        user: penv.db.pgUser,
+        password: penv.db.pgPw,
+        database: penv.db.pgDb
     });
     return pool;
 };

@@ -45,6 +45,7 @@ export default class Server {
 
     public async initDatabase(migrationsFolderPath: string): Promise<void> {
         await this.database.createDatabaseIfNotExists();
+        await this.database.createSchemaIfNotExists();
         await this.database.runMigrations(migrationsFolderPath, this.database);
     }
 }

@@ -1,19 +1,23 @@
-import { createMultipleStatementsConnection } from "./createConnections";
+import { container } from "tsyringe";
+import { createSqlLog } from "./../functions/logging";
+import { Client } from "pg";
+import { createMultipleStatementsClient } from "./createConnections";
 import { lazyHandleException } from "../functions/exceptionHandling";
-import { Connection } from "mysql2/promise";
 import { Logger } from "../../core/Logger";
 import fs from "fs";
 
 export const executeSqlFromFile = async (sqlFilePath: string): Promise<void> => {
-    const logger: Logger = new Logger();
+    const logger: Logger = container.resolve(Logger);
     try {
-        const connection: Connection = await createMultipleStatementsConnection();
         const extension: string | undefined = sqlFilePath.split(".").pop();
         if (!extension || extension !== "sql") throw new Error("file should have '.sql' extension");
 
         const sql: string = fs.readFileSync(sqlFilePath).toString();
-        await connection.query(sql);
-        logger.debug(`executing query from file succeeded: ${sql}`);
+        const client: Client = createMultipleStatementsClient();
+        await client.connect();
+        await client.query(sql);
+
+        logger.debug(`executing query from file succeeded: ${JSON.stringify(createSqlLog(sql))}`);
     } catch (e) {
         lazyHandleException(e, "executing query from file failed", logger);
     }
