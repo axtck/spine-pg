@@ -1,8 +1,10 @@
+import { container } from "tsyringe";
+import { penv } from "./../../config/penv";
 import { lazyHandleException } from "./../functions/exceptionHandling";
 import { Id, Nullable, QueryString } from "./../../types";
 import { Database } from "./../../core/Database";
 import { readdir } from "fs/promises";
-import { IMigrationFile, IMigrationFileInfo, CreationStatus } from "./types";
+import { IMigrationFile, IMigrationFileInfo } from "./types";
 import { Logger } from "../../core/Logger";
 import path from "path";
 
@@ -10,8 +12,7 @@ export const runMigrations = async (migrationsFolderPath: string, database: Data
     const logger: Logger = new Logger();
     try {
         // create migrations table
-        const createTableStatus: CreationStatus = await createMigrationsTable(database);
-        if (createTableStatus === CreationStatus.Exists) logger.info("migrations table not created (exists)");
+        await createMigrationsTable(database);
 
         let files: string[];
         try {
@@ -55,23 +56,33 @@ export const runMigrations = async (migrationsFolderPath: string, database: Data
     }
 };
 
-const createMigrationsTable = async (database: Database): Promise<CreationStatus> => {
-    const existingTable = await database.query<unknown>("SHOW TABLES LIKE 'migrations'");
-    if (existingTable?.length) return CreationStatus.Exists;
+const createMigrationsTable = async (database: Database): Promise<void> => {
+    const logger: Logger = container.resolve(Logger);
+    const getMigrationsTableQuery: QueryString = `
+        SELECT table_name FROM information_schema.tables 
+        WHERE table_schema = '${penv.db.pgSchema}' AND table_name = 'migrations'
+    `;
 
+    const existingTable: unknown[] = await database.query(getMigrationsTableQuery);
+    if (existingTable.length) {
+        logger.info("migrations table not created (exists)");
+        return;
+    }
+
+    // update these queries!!
     const createMigrationsTableQuery: QueryString = `
-        CREATE TABLE \`migrations\` (
-            \`id\` bigint NOT NULL,
-            \`name\` varchar(100) NOT NULL,
-            \`succeeded\` tinyint(1) NOT NULL,
-            \`created\` datetime NOT NULL,
-            \`executed\` datetime NOT NULL,
+        CREATE TABLE migrations (
+            "id" bigint NOT NULL,
+            "name" varchar(100) NOT NULL,
+            "succeeded" tinyint(1) NOT NULL,
+            "created" datetime NOT NULL,
+            "executed" datetime NOT NULL,
             PRIMARY KEY (\`id\`)
         )
     `;
 
     await database.query(createMigrationsTableQuery);
-    return CreationStatus.Created;
+    logger.info("successfully created migrations table");
 };
 
 const insertOrUpdateMigration = async (database: Database, migrationFileInfo: IMigrationFileInfo, succeeded: boolean): Promise<void> => {
