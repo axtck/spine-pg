@@ -35,17 +35,15 @@ const parseArgv = () => {
         string: "name",
         alias: { n: "name" }
     });
+    const argKeys = Object.keys(args);
 
     // arg validation
-    for (const key of Object.keys(args)) {
+    if (!args.name && !args.n) throw new Error(`expected name, n or _, got ${argKeys.join(", ")}`)
+    if (args?._?.length) throw new Error(`parsing args failed: '${args._.join(", ")}' ${args._.length > 1 ? "are" : "is"} invalid`);
+    for (const key of argKeys) {
         if (!["_", "name", "n"].includes(key)) throw new Error(`${key} is not a valid arg, use name => npm run migration:create -- (--name=x | --name x | --n=x | --n x)`);
     }
-    if (args._ && args._.length) {
-        throw new Error(`parsing args failed: '${JSON.stringify(extra)}' ${extra.length > 1 ? "are" : "is"} invalid`);
-    }
-    if (!/^[a-zA-Z0-9]+$/.test(args.name)) {
-        throw new Error("name has to meet /^[a-zA-Z0-9]+$/");
-    }
+    if (!/^[a-zA-Z0-9]+$/.test(args.name)) throw new Error("name has to meet /^[a-zA-Z0-9]+$/");
 
     return {
         name: args.name
