@@ -32,3 +32,7 @@ export const createSqlLog = (sql: string, parameters?: unknown[]): SqlLog => {
 
     return log;
 };
+
+export const createCleanSqlLogString = (slqLog: SqlLog): string => {
+    return JSON.stringify(slqLog).replace(/\\/g, "");
+};

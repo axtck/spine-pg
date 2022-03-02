@@ -1,8 +1,10 @@
+import { container } from "tsyringe";
+import { penv } from "./../../config/penv";
 import { lazyHandleException } from "./../functions/exceptionHandling";
-import { Id, Nullable, QueryString } from "./../../types";
+import { Id, QueryString } from "./../../types";
 import { Database } from "./../../core/Database";
 import { readdir } from "fs/promises";
-import { IMigrationFile, IMigrationFileInfo, CreationStatus } from "./types";
+import { IMigrationFile, IMigrationFileInfo } from "./types";
 import { Logger } from "../../core/Logger";
 import path from "path";
 
@@ -10,15 +12,14 @@ export const runMigrations = async (migrationsFolderPath: string, database: Data
     const logger: Logger = new Logger();
     try {
         // create migrations table
-        const createTableStatus: CreationStatus = await createMigrationsTable(database);
-        if (createTableStatus === CreationStatus.Exists) logger.info("migrations table not created (exists)");
+        await createMigrationsTable(database);
 
         let files: string[];
         try {
             // get migrations
             files = await readdir(migrationsFolderPath);
         } catch {
-            logger.info("no migrations to run");
+            logger.info("reading migrations folder failed");
             return;
         }
         const compiledMigrationFiles: string[] = files.filter((f) => f.split(".")[f.split(".").length - 1] === "js");
@@ -55,33 +56,41 @@ export const runMigrations = async (migrationsFolderPath: string, database: Data
     }
 };
 
-const createMigrationsTable = async (database: Database): Promise<CreationStatus> => {
-    const existingTable = await database.query<unknown>("SHOW TABLES LIKE 'migrations'");
-    if (existingTable?.length) return CreationStatus.Exists;
+const createMigrationsTable = async (database: Database): Promise<void> => {
+    const logger: Logger = container.resolve(Logger);
+    const getMigrationsTableQuery: QueryString = `
+        SELECT table_name FROM information_schema.tables 
+        WHERE table_schema = '${penv.db.pgSchema}' AND table_name = 'migrations'
+    `;
+
+    const existingTable: unknown[] = await database.query(getMigrationsTableQuery);
+    if (existingTable.length) {
+        logger.info("migrations table not created (exists)");
+        return;
+    }
 
     const createMigrationsTableQuery: QueryString = `
-        CREATE TABLE \`migrations\` (
-            \`id\` bigint NOT NULL,
-            \`name\` varchar(100) NOT NULL,
-            \`succeeded\` tinyint(1) NOT NULL,
-            \`created\` datetime NOT NULL,
-            \`executed\` datetime NOT NULL,
-            PRIMARY KEY (\`id\`)
+        CREATE TABLE spine.migrations (
+            "id" int8 NOT NULL,
+            "name" varchar(100) NOT NULL,
+            "succeeded" bool NOT NULL,
+            "created" timestamp NOT NULL,
+            "executed" timestamp NOT NULL,
+            CONSTRAINT migrations_pk PRIMARY KEY ("id")
         )
     `;
 
     await database.query(createMigrationsTableQuery);
-    return CreationStatus.Created;
+    logger.info("successfully created migrations table");
 };
 
 const insertOrUpdateMigration = async (database: Database, migrationFileInfo: IMigrationFileInfo, succeeded: boolean): Promise<void> => {
     const insertMigrationQuery: QueryString = `
-        INSERT INTO migrations 
-        (id, name, succeeded, created, executed)
-        VALUES (?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-        succeeded = VALUES (succeeded), 
-        executed = VALUES (executed)
+        INSERT INTO spine.migrations
+        ("id", "name", "succeeded", "created", "executed") 
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT ("id") DO UPDATE 
+        SET "succeeded" = excluded.succeeded, "executed" = excluded.executed
     `;
 
     const parameters: Array<number | string | Date | boolean> = [
@@ -95,21 +104,21 @@ const insertOrUpdateMigration = async (database: Database, migrationFileInfo: IM
     await database.query(insertMigrationQuery, parameters);
 };
 
-const getStoredMigrations = async (database: Database): Promise<Nullable<Array<{ id: Id; }>>> => {
-    const getStoredMigrationsQuery: QueryString = "SELECT id FROM migrations";
-    const storedMigrations = await database.query<{ id: Id; }>(getStoredMigrationsQuery);
+const getStoredMigrations = async (database: Database): Promise<Array<{ id: string; }>> => {
+    const getStoredMigrationsQuery: QueryString = "SELECT id FROM spine.migrations";
+    const storedMigrations: Array<{ id: string; }> = await database.query(getStoredMigrationsQuery);
     return storedMigrations;
 };
 
-const getFailedMigrations = async (database: Database): Promise<Nullable<Array<{ id: Id; }>>> => {
-    const getMigrationsQuery: QueryString = "SELECT id FROM migrations WHERE succeeded = FALSE";
-    const failedMigrations = await database.query<{ id: number; }>(getMigrationsQuery);
+const getFailedMigrations = async (database: Database): Promise<Array<{ id: string; }>> => {
+    const getMigrationsQuery: QueryString = "SELECT id FROM spine.migrations WHERE succeeded = FALSE";
+    const failedMigrations: Array<{ id: string; }> = await database.query(getMigrationsQuery);
     return failedMigrations;
 };
 
 const getMigrationsToRun = async (database: Database, migrationFiles: string[]): Promise<string[]> => {
-    const storedMigrationIds = (await getStoredMigrations(database) || []).map(m => m.id);
-    const failedMigrationIds = (await getFailedMigrations(database) || []).map(m => m.id);
+    const storedMigrationIds: Id[] = (await getStoredMigrations(database)).map(m => Number(m.id));
+    const failedMigrationIds: Id[] = (await getFailedMigrations(database)).map(m => Number(m.id));
 
     // filter out new migrations 
     const newMigrations = migrationFiles.filter((m) => {

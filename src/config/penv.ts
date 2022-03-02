@@ -1,6 +1,7 @@
+import dotenv from "dotenv";
 import { Constants } from "./../Constants";
-require("dotenv").config();
 import { Environment } from "./../types";
+dotenv.config();
 
 if (process.env.NODE_ENV && !Constants.environments.includes(process.env.NODE_ENV as Environment)) {
     throw new Error(`environment '${process.env.NODE_ENV}' invalid, possible environments: undefined (development) - development - test - staging - production`);
@@ -15,11 +16,12 @@ export const penv = {
         environment: environement
     },
     db: {
-        mysqlHost: process.env.MYSQL_HOST,
-        mysqlPort: Number(process.env.MYSQL_PORT) || undefined,
-        mysqlDb: `${environement}db`,
-        mysqlUser: process.env.MYSQL_USER,
-        mysqlPw: process.env.MYSQL_PASSWORD
+        pgHost: process.env.PG_HOST,
+        pgPort: Number(process.env.PG_PORT) || undefined,
+        pgDb: `${environement}db`,
+        pgUser: process.env.PG_USER,
+        pgPw: process.env.PG_PASSWORD,
+        pgSchema: "spine" // static name for initializing (if change => also change in database/createInitialTables.sql)
     },
     auth: {
         jwtAuthkey: process.env.JWT_AUTHKEY
