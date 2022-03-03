@@ -39,7 +39,8 @@ export const createSchemaIfNotExists = async (): Promise<void> => {
         }
 
         await database.query(`CREATE SCHEMA ${schemaName} AUTHORIZATION ${penv.db.pgUser}`);
-        logger.info(`created schema '${schemaName}'`);
+        await database.query(`ALTER DATABASE ${penv.db.pgDb} SET search_path TO ${schemaName}`); // set the search path to schema
+        logger.info(`created schema '${schemaName}' and set search_path`);
     } catch (e) {
         lazyHandleException(e, "creating schema failed", logger);
     }

@@ -70,7 +70,7 @@ const createMigrationsTable = async (database: Database): Promise<void> => {
     }
 
     const createMigrationsTableQuery: QueryString = `
-        CREATE TABLE spine.migrations (
+        CREATE TABLE migrations (
             "id" int8 NOT NULL,
             "name" varchar(100) NOT NULL,
             "succeeded" bool NOT NULL,
@@ -86,7 +86,7 @@ const createMigrationsTable = async (database: Database): Promise<void> => {
 
 const insertOrUpdateMigration = async (database: Database, migrationFileInfo: IMigrationFileInfo, succeeded: boolean): Promise<void> => {
     const insertMigrationQuery: QueryString = `
-        INSERT INTO spine.migrations
+        INSERT INTO migrations
         ("id", "name", "succeeded", "created", "executed") 
         VALUES ($1, $2, $3, $4, $5)
         ON CONFLICT ("id") DO UPDATE 
@@ -105,13 +105,13 @@ const insertOrUpdateMigration = async (database: Database, migrationFileInfo: IM
 };
 
 const getStoredMigrations = async (database: Database): Promise<Array<{ id: string; }>> => {
-    const getStoredMigrationsQuery: QueryString = "SELECT id FROM spine.migrations";
+    const getStoredMigrationsQuery: QueryString = "SELECT id FROM migrations";
     const storedMigrations: Array<{ id: string; }> = await database.query(getStoredMigrationsQuery);
     return storedMigrations;
 };
 
 const getFailedMigrations = async (database: Database): Promise<Array<{ id: string; }>> => {
-    const getMigrationsQuery: QueryString = "SELECT id FROM spine.migrations WHERE succeeded = FALSE";
+    const getMigrationsQuery: QueryString = "SELECT id FROM migrations WHERE succeeded = FALSE";
     const failedMigrations: Array<{ id: string; }> = await database.query(getMigrationsQuery);
     return failedMigrations;
 };
