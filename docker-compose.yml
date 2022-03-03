@@ -2,28 +2,29 @@ version: "3.9"
 
 services:
   # --- DATABASE
-  mysql-main:
-    image: mysql:8
-    container_name: "mysql-main"
-    command: --default-authentication-plugin=mysql_native_password
+  pg-main:
+    image: postgres:14-alpine
+    container_name: "pg-main"
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
     healthcheck:
       # checks if database is ready
-      test: mysqladmin ping -h 127.0.0.1 -u ${MYSQL_USER} --password=${MYSQL_PASSWORD}
+      test: [ "CMD-SHELL", "pg_isready -U ${PG_USER}" ]
       timeout: 20s
       retries: 5
     ports:
-      - ${COMPOSE_MYSQL_PORT}:3306
+      - ${COMPOSE_PG_PORT}:5432
     volumes:
-      - ./docker/volumes/mysql-main:/var/lib/mysql
+      - ./docker/volumes/pg-main:/var/lib/postgresql/data
 
   # --- SERVER
   server-main:
     container_name: "server-main"
     depends_on:
-      mysql-main:
+      pg-main:
         condition: service_healthy # only start server when database is ready
     build:
       args:
@@ -36,8 +37,8 @@ services:
     environment:
       # overwrite container specific environment variables separately
       - HOST_SERVER_PORT=${COMPOSE_SERVER_PORT} # docker is host inside docker env 
-      - MYSQL_HOST=mysql-main # mysql-main (db) container is mysql host inside docker env 
-      - MYSQL_PORT=3306 # port is 3306 inside docker env 
+      - PG_HOST=pg-main # pg-main (db) container is mysql host inside docker env 
+      - PG_PORT=5432 # port is 5432 inside docker env 
     ports:
       - ${HOST_SERVER_PORT}:${COMPOSE_SERVER_PORT} # map to outside container
     stdin_open: true
