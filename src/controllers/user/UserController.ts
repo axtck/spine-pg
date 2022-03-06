@@ -1,9 +1,9 @@
 import { Logger } from "../../core/Logger";
 import { AuthJwtMiddleware } from "../../middlewares/AuthJwtMiddleware";
-import { UserService } from "../../controllers/user/UserService";
+import { UserService } from "./services/UserService";
 import { Request, Response } from "express";
 import { Controller } from "../../core/Controller";
-import { IControllerRoute } from "../../core/types";
+import { IControllerRoute } from "../types";
 import { HttpMethod } from "../../types";
 import { injectable } from "tsyringe";
 
@@ -20,19 +20,19 @@ export class UserController extends Controller {
     }
 
     public async handleAllContent(req: Request, res: Response): Promise<void> {
-        this.sendSuccess(res, undefined, "All content.");
+        this.sendSuccess(res, undefined, "all content");
     }
 
     public async handleUserContent(req: Request, res: Response): Promise<void> {
-        this.sendSuccess(res, undefined, "User content.");
+        this.sendSuccess(res, undefined, "user content");
     }
 
     public async handleAdminContent(req: Request, res: Response): Promise<void> {
-        this.sendSuccess(res, undefined, "Admin content.");
+        this.sendSuccess(res, undefined, "admin content");
     }
 
     public async handleModeratorContent(req: Request, res: Response): Promise<void> {
-        this.sendSuccess(res, undefined, "Moderator content.");
+        this.sendSuccess(res, undefined, "moderator content");
     }
 
     protected get routes(): IControllerRoute[] {

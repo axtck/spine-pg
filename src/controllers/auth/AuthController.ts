@@ -3,8 +3,9 @@ import { VerifySignupMiddleware } from "../../middlewares/VerifySignupMiddleware
 import { AuthService } from "../../controllers/auth/AuthService";
 import { NextFunction, Request, Response } from "express";
 import { Controller } from "../../core/Controller";
-import { IControllerRoute } from "../../core/types";
-import { HttpMethod, IUser, Nullable } from "../../types";
+import { IControllerRoute } from "../types";
+import { HttpMethod, Nullable } from "../../types";
+import { IUserCredentials } from "../user/types";
 import { ApiError } from "../../lib/errors/ApiError";
 import { penv } from "../../config/penv";
 import { ILoginResponse } from "../types";
@@ -40,7 +41,7 @@ export class AuthController extends Controller {
 
     public async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user: Nullable<IUser> = await this.authService.getUserByUsername(req.body.username);
+            const user: Nullable<IUserCredentials> = await this.authService.getUserByUsername(req.body.username);
             if (!user) {
                 next(ApiError.unauthorized(`user '${req.body.username}' not found`));
                 return;

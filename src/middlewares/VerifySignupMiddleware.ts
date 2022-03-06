@@ -1,6 +1,6 @@
 import { lazyHandleException } from "../lib/functions/exceptionHandling";
 import { Constants } from "./../Constants";
-import { UserRole } from "./../types";
+import { UserRole } from "../controllers/user/types";
 import { ApiError } from "./../lib/errors/ApiError";
 import { AuthService } from "../controllers/auth/AuthService";
 import { Request, Response, NextFunction } from "express";

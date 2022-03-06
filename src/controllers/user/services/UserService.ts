@@ -1,6 +1,6 @@
-import { Logger } from "./../../core/Logger";
-import { UserRepository } from "./UserRepository";
-import { Service } from "../../core/Service";
+import { Logger } from "../../../core/Logger";
+import { UserRepository } from "../repositories/UserRepository";
+import { Service } from "../../../core/Service";
 import { injectable } from "tsyringe";
 
 @injectable()

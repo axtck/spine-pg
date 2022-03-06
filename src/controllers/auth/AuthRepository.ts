@@ -1,5 +1,6 @@
 import { Database } from "./../../core/Database";
-import { IUser, QueryString } from "../../types";
+import { IUserCredentials } from "../user/types";
+import { QueryString } from "../../types";
 import { Id, Nullable } from "../../types";
 import { Repository } from "../../core/Repository";
 import { injectable } from "tsyringe";
@@ -10,6 +11,7 @@ export class AuthRepository extends Repository {
     constructor(logger: Logger, database: Database) {
         super(logger, database);
     }
+
     public async createUser(username: string, email: string, password: string): Promise<void> {
         const createUserQuery: QueryString = `
             INSERT INTO users 
@@ -40,9 +42,9 @@ export class AuthRepository extends Repository {
         return foundRole;
     }
 
-    public async getUserByUsername(username: string): Promise<Nullable<IUser>> {
+    public async getUserByUsername(username: string): Promise<Nullable<IUserCredentials>> {
         const getUserQuery: QueryString = "SELECT * FROM users WHERE username = $1";
-        const user: Nullable<IUser> = await this.database.queryOne(getUserQuery, [username]);
+        const user: Nullable<IUserCredentials> = await this.database.queryOne(getUserQuery, [username]);
         return user;
     }
 

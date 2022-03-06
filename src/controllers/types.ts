@@ -1,4 +1,5 @@
-import { Id } from "./../types";
+import { RequestHandler } from "express";
+import { HttpMethod, Id } from "./../types";
 
 export interface ILoginResponse {
     id: Id;
@@ -7,3 +8,11 @@ export interface ILoginResponse {
     roles: string[];
     accessToken: unknown;
 }
+
+export interface IControllerRoute {
+    path: string;
+    method: HttpMethod;
+    handler: RequestHandler;
+    localMiddleware: RequestHandler[];
+}
+

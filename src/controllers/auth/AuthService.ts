@@ -1,5 +1,6 @@
 import { Logger } from "./../../core/Logger";
-import { Id, IUser, Nullable } from "../../types";
+import { IUserCredentials } from "../user/types";
+import { Id, Nullable } from "../../types";
 import { AuthRepository } from "./AuthRepository";
 import { Service } from "../../core/Service";
 import { injectable } from "tsyringe";
@@ -37,8 +38,8 @@ export class AuthService extends Service {
         }
     }
 
-    public async getUserByUsername(username: string): Promise<Nullable<IUser>> {
-        const user: Nullable<IUser> = await this.authRepository.getUserByUsername(username);
+    public async getUserByUsername(username: string): Promise<Nullable<IUserCredentials>> {
+        const user: Nullable<IUserCredentials> = await this.authRepository.getUserByUsername(username);
         return user;
     }
 

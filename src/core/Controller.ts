@@ -1,7 +1,7 @@
 import { Logger } from "./Logger";
 import { Response, Router } from "express";
 import { HttpMethod } from "../types";
-import { IControllerRoute } from "./types";
+import { IControllerRoute } from "../controllers/types";
 
 export abstract class Controller {
     public router: Router;
