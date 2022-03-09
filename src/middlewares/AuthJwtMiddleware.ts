@@ -1,5 +1,5 @@
 import { ApiError } from "./../lib/errors/ApiError";
-import { AuthService } from "../controllers/auth/AuthService";
+import { UserService } from "../controllers/user/services/UserService";
 import { Request, Response, NextFunction } from "express";
 import { penv } from "../config/penv";
 import { Middleware } from "../core/Middleware";
@@ -10,14 +10,14 @@ import { injectable } from "tsyringe";
 
 @injectable()
 export class AuthJwtMiddleware extends Middleware {
-    private readonly authService: AuthService;
-    constructor(logger: Logger, authService: AuthService) {
+    private readonly userService: UserService;
+    constructor(logger: Logger, userService: UserService) {
         super(logger);
-        this.authService = authService;
+        this.userService = userService;
     }
 
     public verifyToken = (req: Request, res: Response, next: NextFunction): Response | void => {
-        const token = req.header("x-access-token");
+        const token: string | undefined = req.header("x-access-token");
 
         if (!token) {
             next(ApiError.forbidden("no token provided"));
@@ -60,7 +60,7 @@ export class AuthJwtMiddleware extends Middleware {
             return;
         }
 
-        const userRoleNames = await this.authService.getUserRoleNames(req.id);
+        const userRoleNames = await this.userService.getUserRoleNames(req.id);
         this.authenticateRole(req.id, userRoleNames, "admin", next);
     };
 
@@ -70,7 +70,7 @@ export class AuthJwtMiddleware extends Middleware {
             return;
         }
 
-        const userRoleNames = await this.authService.getUserRoleNames(req.id);
+        const userRoleNames = await this.userService.getUserRoleNames(req.id);
         this.authenticateRole(req.id, userRoleNames, "moderator", next);
     };
 }
