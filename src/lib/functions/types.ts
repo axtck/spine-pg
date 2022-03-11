@@ -1,4 +1,4 @@
-export interface SqlLog {
+export interface ISqlLog {
     sql: string;
     parameters: unknown[];
 } 

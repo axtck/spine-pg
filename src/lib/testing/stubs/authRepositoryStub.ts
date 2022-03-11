@@ -1,5 +1,5 @@
 import sinon, { SinonStubbedInstance } from "sinon";
-import { AuthRepository } from "../../../controllers/auth/AuthRepository";
+import { UserRepository } from "../../../controllers/user/repositories/UserRepository";
 import {
     dummyAdmin, dummyAdminRole, dummyModerator,
     dummyModeratorRole, dummyUser, dummyUserRole
@@ -7,7 +7,7 @@ import {
 
 
 // auth repository
-const authRepositoryStub: SinonStubbedInstance<AuthRepository> = sinon.createStubInstance(AuthRepository);
+const authRepositoryStub: SinonStubbedInstance<UserRepository> = sinon.createStubInstance(UserRepository);
 
 // get created user id
 authRepositoryStub.getCreatedUserIdByUsername.withArgs(dummyUser.username).resolves({ id: dummyUser.id });

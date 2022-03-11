@@ -1,5 +1,5 @@
-import { Environment, UserRole } from "./types";
-// constants
+import { UserRole } from "./controllers/user/types";
+import { Environment } from "./types";
 export class Constants {
     static readonly logLevels = {
         error: 0,
@@ -17,11 +17,8 @@ export class Constants {
         debug: "cyan"
     };
 
-    static readonly userRoles: UserRole[] = [
-        UserRole.User, UserRole.Admin, UserRole.Moderator
-    ];
+    static readonly userRoles: UserRole[] = Object.values(UserRole);
 
-    static readonly environments: Environment[] = [
-        Environment.Development, Environment.Test, Environment.Staging, Environment.Production
-    ];
+    static readonly environments: Environment[] = Object.values(Environment);
+
 }

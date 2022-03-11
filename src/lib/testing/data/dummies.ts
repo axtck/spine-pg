@@ -1,4 +1,5 @@
-import { IRole, IUser, UserRole } from "../../../types";
+import { IUserCredentials } from "../../../controllers/user/types";
+import { IRole, UserRole } from "../../../controllers/user/types";
 
 export const userRoles: IRole[] = [
     {
@@ -19,7 +20,7 @@ export const dummyUserRole: IRole = userRoles[0];
 export const dummyAdminRole: IRole = userRoles[1];
 export const dummyModeratorRole: IRole = userRoles[2];
 
-export const baseUsers: IUser[] = [
+export const baseUsers: IUserCredentials[] = [
     {
         id: 1,
         username: UserRole.User,
@@ -40,6 +41,6 @@ export const baseUsers: IUser[] = [
     }
 ];
 
-export const dummyUser: IUser = baseUsers[0];
-export const dummyAdmin: IUser = baseUsers[1];
-export const dummyModerator: IUser = baseUsers[2];
+export const dummyUser: IUserCredentials = baseUsers[0];
+export const dummyAdmin: IUserCredentials = baseUsers[1];
+export const dummyModerator: IUserCredentials = baseUsers[2];

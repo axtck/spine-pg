@@ -19,7 +19,7 @@ export const runMigrations = async (migrationsFolderPath: string, database: Data
             // get migrations
             files = await readdir(migrationsFolderPath);
         } catch {
-            logger.info("reading migrations folder failed");
+            logger.info("reading migrations folder failed (possibly empty because no migration was created / needed)");
             return;
         }
         const compiledMigrationFiles: string[] = files.filter((f) => f.split(".")[f.split(".").length - 1] === "js");

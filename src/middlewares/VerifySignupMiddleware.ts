@@ -1,8 +1,8 @@
 import { lazyHandleException } from "../lib/functions/exceptionHandling";
 import { Constants } from "./../Constants";
-import { UserRole } from "./../types";
+import { UserRole } from "../controllers/user/types";
 import { ApiError } from "./../lib/errors/ApiError";
-import { AuthService } from "../controllers/auth/AuthService";
+import { UserService } from "../controllers/user/services/UserService";
 import { Request, Response, NextFunction } from "express";
 import { Middleware } from "../core/Middleware";
 import { Logger } from "../core/Logger";
@@ -10,22 +10,21 @@ import { injectable } from "tsyringe";
 
 @injectable()
 export class VerifySignupMiddleware extends Middleware {
-    private readonly authService: AuthService;
-    constructor(logger: Logger, authService: AuthService) {
+    private readonly userService: UserService;
+    constructor(logger: Logger, userService: UserService) {
         super(logger);
-        this.authService = authService;
+        this.userService = userService;
     }
 
     public checkDuplicateUsernameOrEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        this.logger.info("test");
         try {
-            const duplicateUsername = await this.authService.getDuplicateUsernameId(req.body.username);
+            const duplicateUsername = await this.userService.getDuplicateUsernameId(req.body.username);
             if (duplicateUsername) {
                 next(ApiError.badRequest(`username '${req.body.username}' already in use`));
                 return;
             }
 
-            const duplicateEmail = await this.authService.getDuplicateEmailId(req.body.email);
+            const duplicateEmail = await this.userService.getDuplicateEmailId(req.body.email);
             if (duplicateEmail) {
                 next(ApiError.badRequest(`email '${req.body.email}' already in use`));
                 return;

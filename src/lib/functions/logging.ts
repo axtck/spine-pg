@@ -1,4 +1,4 @@
-import { SqlLog } from "./types";
+import { ISqlLog } from "./types";
 export const transformKeyValueJSON = (jsonData: unknown): string => {
     // split
     const splitRegex = new RegExp(/,"/);
@@ -22,10 +22,10 @@ export const validateParameters = (sql: string, parameters: Array<string | numbe
     return count === nOptions;
 };
 
-export const createSqlLog = (sql: string, parameters?: unknown[]): SqlLog => {
+export const createSqlLog = (sql: string, parameters?: unknown[]): ISqlLog => {
     const trimmed: string = sql.replace(/\n/g, "").replace(/\s+/g, " ").trim();
 
-    const log: SqlLog = {
+    const log: ISqlLog = {
         sql: trimmed,
         parameters: parameters || []
     };
@@ -33,6 +33,6 @@ export const createSqlLog = (sql: string, parameters?: unknown[]): SqlLog => {
     return log;
 };
 
-export const createCleanSqlLogString = (slqLog: SqlLog): string => {
+export const createCleanSqlLogString = (slqLog: ISqlLog): string => {
     return JSON.stringify(slqLog).replace(/\\/g, "");
 };

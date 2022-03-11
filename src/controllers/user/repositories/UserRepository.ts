@@ -1,15 +1,18 @@
-import { Database } from "./../../core/Database";
-import { IUser, QueryString } from "../../types";
-import { Id, Nullable } from "../../types";
-import { Repository } from "../../core/Repository";
+import { Database } from "../../../core/Database";
+import { IUserCredentials } from "../types";
+import { QueryString } from "../../../types";
+import { Id, Nullable } from "../../../types";
+import { Repository } from "../../../core/Repository";
 import { injectable } from "tsyringe";
-import { Logger } from "../../core/Logger";
+import { Logger } from "../../../core/Logger";
+import { IUserBaseDao } from "../daos/UserBaseDao";
 
 @injectable()
-export class AuthRepository extends Repository {
+export class UserRepository extends Repository {
     constructor(logger: Logger, database: Database) {
         super(logger, database);
     }
+
     public async createUser(username: string, email: string, password: string): Promise<void> {
         const createUserQuery: QueryString = `
             INSERT INTO users 
@@ -40,10 +43,25 @@ export class AuthRepository extends Repository {
         return foundRole;
     }
 
-    public async getUserByUsername(username: string): Promise<Nullable<IUser>> {
+    public async getUserByUsername(username: string): Promise<Nullable<IUserCredentials>> {
         const getUserQuery: QueryString = "SELECT * FROM users WHERE username = $1";
-        const user: Nullable<IUser> = await this.database.queryOne(getUserQuery, [username]);
+        const user: Nullable<IUserCredentials> = await this.database.queryOne(getUserQuery, [username]);
         return user;
+    }
+
+    public async getBaseById(id: Id): Promise<Nullable<IUserBaseDao>> {
+        const getBaseByIdQuery: QueryString = `
+            SELECT
+                id,
+                username,
+                email,
+                password
+            FROM users 
+            WHERE id = $1
+        `;
+
+        const userBase: Nullable<IUserBaseDao> = await this.database.queryOne(getBaseByIdQuery, [id]);
+        return userBase;
     }
 
     public async getUserRoleNamesByUserId(userId: Id): Promise<Array<{ name: string; }>> {

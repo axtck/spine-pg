@@ -1,31 +1,38 @@
 import { Logger } from "../../core/Logger";
 import { VerifySignupMiddleware } from "../../middlewares/VerifySignupMiddleware";
-import { AuthService } from "../../controllers/auth/AuthService";
+import { UserService } from "../user/services/UserService";
 import { NextFunction, Request, Response } from "express";
 import { Controller } from "../../core/Controller";
-import { IControllerRoute } from "../../core/types";
-import { HttpMethod, IUser, Nullable } from "../../types";
+import { IControllerRoute } from "../types";
+import { HttpMethod, Nullable } from "../../types";
+import { IUserCredentials } from "../user/types";
 import { ApiError } from "../../lib/errors/ApiError";
 import { penv } from "../../config/penv";
 import { ILoginResponse } from "../types";
 import { injectable } from "tsyringe";
+import { AuthService } from "./AuthService";
 
 @injectable()
 export class AuthController extends Controller {
     public path = "/auth";
     private readonly authService: AuthService;
+    private readonly userService: UserService;
     private readonly verifySignupMiddleware: VerifySignupMiddleware;
 
-    constructor(logger: Logger, authService: AuthService, verifySignupMiddleware: VerifySignupMiddleware) {
+    constructor(logger: Logger,
+        authService: AuthService,
+        userService: UserService,
+        verifySignupMiddleware: VerifySignupMiddleware) {
         super(logger);
         this.authService = authService;
+        this.userService = userService;
         this.verifySignupMiddleware = verifySignupMiddleware;
     }
 
     public async handleSignup(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            await this.authService.createUser(req.body.username, req.body.email, req.body.password);
-            await this.authService.assignRoles(req.body.username, req.body.roles);
+            await this.userService.createUser(req.body.username, req.body.email, req.body.password);
+            await this.userService.assignRoles(req.body.username, req.body.roles);
 
             this.sendSuccess(res, undefined, `user '${req.body.username}' succesfully created`);
         } catch (e) {
@@ -40,7 +47,7 @@ export class AuthController extends Controller {
 
     public async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user: Nullable<IUser> = await this.authService.getUserByUsername(req.body.username);
+            const user: Nullable<IUserCredentials> = await this.userService.getUserByUsername(req.body.username);
             if (!user) {
                 next(ApiError.unauthorized(`user '${req.body.username}' not found`));
                 return;
@@ -53,7 +60,7 @@ export class AuthController extends Controller {
             }
 
             const token: unknown = this.authService.signToken(user.id, penv.auth.jwtAuthkey);
-            const userRoles: string[] = await this.authService.getUserRoleNames(user.id);
+            const userRoles: string[] = await this.userService.getUserRoleNames(user.id);
 
             const loginResponse: ILoginResponse = {
                 id: user.id,
