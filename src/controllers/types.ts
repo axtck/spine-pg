@@ -15,4 +15,3 @@ export interface IControllerRoute {
     handler: RequestHandler;
     localMiddleware: RequestHandler[];
 }
-

@@ -17,32 +17,32 @@ export class Database {
         this.logger = logger;
     }
 
-    public async query<T>(sql: string, parameters?: unknown[]): Promise<T[]> {
+    public query = async <T>(sql: string, parameters?: unknown[]): Promise<T[]> => {
         this.logger.info(`executing query: ${createCleanSqlLogString(createSqlLog(sql, parameters))}}`);
         const result: QueryResult<T> = await this.pool.query<T>(sql, parameters);
         return result.rows;
-    }
+    };
 
-    public async queryOne<T>(sql: string, parameters?: unknown[]): Promise<Nullable<T>> {
+    public queryOne = async <T>(sql: string, parameters?: unknown[]): Promise<Nullable<T>> => {
         const result: T[] = await this.query<T>(sql, parameters);
         if (!result || !result.length) return null;
         if (result.length < 1) throw new Error(`more than one row for query: ${createCleanSqlLogString(createSqlLog(sql, parameters))}`);
         return result[0];
-    }
+    };
 
-    public async createDatabaseIfNotExists(): Promise<void> {
+    public createDatabaseIfNotExists = async (): Promise<void> => {
         await createDatabaseIfNotExists();
-    }
+    };
 
-    public async createSchemaIfNotExists(): Promise<void> {
+    public createSchemaIfNotExists = async (): Promise<void> => {
         await createSchemaIfNotExists();
-    }
+    };
 
-    public async createInitialTablesIfNotExists(): Promise<void> {
+    public createInitialTablesIfNotExists = async (): Promise<void> => {
         await createInitialTablesIfNotExists();
-    }
+    };
 
-    public async runMigrations(migrationsFolderPath: string, database: Database): Promise<void> {
+    public runMigrations = async (migrationsFolderPath: string, database: Database): Promise<void> => {
         await runMigrations(migrationsFolderPath, database);
-    }
+    };
 }

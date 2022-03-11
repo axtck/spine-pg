@@ -29,7 +29,7 @@ export class AuthController extends Controller {
         this.verifySignupMiddleware = verifySignupMiddleware;
     }
 
-    public async handleSignup(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public handleSignup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             await this.userService.createUser(req.body.username, req.body.email, req.body.password);
             await this.userService.assignRoles(req.body.username, req.body.roles);
@@ -43,9 +43,9 @@ export class AuthController extends Controller {
             next(ApiError.internal(`signup failed: ${e}`));
             return;
         }
-    }
+    };
 
-    public async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public handleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const user: Nullable<IUserCredentials> = await this.userService.getUserByUsername(req.body.username);
             if (!user) {
@@ -79,14 +79,14 @@ export class AuthController extends Controller {
             next(ApiError.internal(`login failed: ${e}`));
             return;
         }
-    }
+    };
 
     protected get routes(): IControllerRoute[] {
         const routes: IControllerRoute[] = [
             {
                 path: "/signup",
                 method: HttpMethod.Post,
-                handler: this.handleSignup.bind(this),
+                handler: this.handleSignup,
                 localMiddleware: [
                     this.verifySignupMiddleware.checkDuplicateUsernameOrEmail,
                     this.verifySignupMiddleware.checkRolesExisted
@@ -95,7 +95,7 @@ export class AuthController extends Controller {
             {
                 path: "/login",
                 method: HttpMethod.Post,
-                handler: this.handleLogin.bind(this),
+                handler: this.handleLogin,
                 localMiddleware: []
             }
         ];

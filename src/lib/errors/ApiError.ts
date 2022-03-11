@@ -1,37 +1,30 @@
+import { HttpStatusCode, HttpStatusName } from "./types";
 export class ApiError extends Error {
-    private _code: number;
-    private _message: string;
+    public code: number;
+    public extra: unknown;
 
-    constructor(code: number, message: string, extraName: string) {
-        super();
+    constructor(message: string, code: HttpStatusCode, extraName: HttpStatusName, extra?: unknown) {
+        super(message);
+        this.code = code;
         this.name = `ApiError (${extraName})`;
-        this._code = code;
-        this._message = message;
+        this.extra = extra;
     }
 
-    public get code(): number {
-        return this._code;
-    }
-
-    public get message(): string {
-        return this._message;
-    }
-
-    static badRequest(msg: string): ApiError {
-        return new ApiError(400, msg, "Bad Request");
-    }
+    public static badRequest = (msg: string, extra?: unknown): ApiError => {
+        return new ApiError(msg, HttpStatusCode.BadRequest, HttpStatusName.BadRequest, extra);
+    };
 
     // similar to 403 Forbidden, but specifically for use when 
     // authentication is required and has failed or has not yet been provided
-    static unauthorized(msg: string): ApiError {
-        return new ApiError(401, msg, "Unauthorized");
-    }
+    public static unauthorized = (msg: string, extra?: unknown): ApiError => {
+        return new ApiError(msg, HttpStatusCode.Unauthorized, HttpStatusName.Unauthorized, extra);
+    };
 
-    static forbidden(msg: string): ApiError {
-        return new ApiError(403, msg, "Forbidden");
-    }
+    public static forbidden = (msg: string, extra?: unknown): ApiError => {
+        return new ApiError(msg, HttpStatusCode.Forbidden, HttpStatusName.Forbidden, extra);
+    };
 
-    static internal(msg: string): ApiError {
-        return new ApiError(500, msg, "Internal");
-    }
+    public static internal = (msg: string, extra?: unknown): ApiError => {
+        return new ApiError(msg, HttpStatusCode.Internal, HttpStatusName.Internal, extra);
+    };
 }

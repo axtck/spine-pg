@@ -4,9 +4,9 @@ import { HttpMethod } from "../types";
 import { IControllerRoute } from "../controllers/types";
 
 export abstract class Controller {
-    public router: Router;
+    private readonly router: Router;
     public abstract path: string;
-    protected abstract readonly routes: IControllerRoute[];
+    protected abstract routes: IControllerRoute[];
     protected readonly logger: Logger;
 
     constructor(logger: Logger) {
@@ -14,7 +14,7 @@ export abstract class Controller {
         this.logger = logger;
     }
 
-    public setRoutes(): Router {
+    public setRoutes = (): Router => {
         for (const route of this.routes) {
             for (const middleware of route.localMiddleware) {
                 this.router.use(route.path, middleware);
@@ -38,12 +38,12 @@ export abstract class Controller {
             }
         }
         return this.router;
-    }
+    };
 
-    protected sendSuccess(res: Response, data?: unknown, message?: string): Response {
+    protected sendSuccess = (res: Response, data?: unknown, message?: string): Response => {
         return res.status(200).json({
             message: message || "success",
             payload: data
         });
-    }
+    };
 }

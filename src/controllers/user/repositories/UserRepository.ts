@@ -13,43 +13,43 @@ export class UserRepository extends Repository {
         super(logger, database);
     }
 
-    public async createUser(username: string, email: string, password: string): Promise<void> {
+    public createUser = async (username: string, email: string, password: string): Promise<void> => {
         const createUserQuery: QueryString = `
             INSERT INTO users 
             (username, email, password)
             VALUES ($1, $2, $3)  
         `;
         await this.database.query(createUserQuery, [username, email, password]);
-    }
+    };
 
-    public async createUserRole(userId: Id, roleId: Id): Promise<void> {
+    public createUserRole = async (userId: Id, roleId: Id): Promise<void> => {
         const createUserRoleQuery: QueryString = `
             INSERT INTO user_roles 
             (user_id, role_id)
             VALUES ($1, $2)
         `;
         await this.database.query(createUserRoleQuery, [userId, roleId]);
-    }
+    };
 
-    public async getCreatedUserIdByUsername(username: string): Promise<Nullable<{ id: Id; }>> {
+    public getCreatedUserIdByUsername = async (username: string): Promise<Nullable<{ id: Id; }>> => {
         const getUserIdQuery: QueryString = "SELECT id FROM users WHERE username = $1";
         const foundUser: Nullable<{ id: Id; }> = await this.database.queryOne(getUserIdQuery, [username]);
         return foundUser;
-    }
+    };
 
-    public async getRoleByName(role: string): Promise<Nullable<{ id: Id; }>> {
+    public getRoleByName = async (role: string): Promise<Nullable<{ id: Id; }>> => {
         const getRoleIdQuery: QueryString = "SELECT id FROM roles WHERE name = $1";
         const foundRole: Nullable<{ id: Id; }> = await this.database.queryOne(getRoleIdQuery, [role]);
         return foundRole;
-    }
+    };
 
-    public async getUserByUsername(username: string): Promise<Nullable<IUserCredentials>> {
+    public getUserByUsername = async (username: string): Promise<Nullable<IUserCredentials>> => {
         const getUserQuery: QueryString = "SELECT * FROM users WHERE username = $1";
         const user: Nullable<IUserCredentials> = await this.database.queryOne(getUserQuery, [username]);
         return user;
-    }
+    };
 
-    public async getBaseById(id: Id): Promise<Nullable<IUserBaseDao>> {
+    public getBaseById = async (id: Id): Promise<Nullable<IUserBaseDao>> => {
         const getBaseByIdQuery: QueryString = `
             SELECT
                 id,
@@ -62,9 +62,9 @@ export class UserRepository extends Repository {
 
         const userBase: Nullable<IUserBaseDao> = await this.database.queryOne(getBaseByIdQuery, [id]);
         return userBase;
-    }
+    };
 
-    public async getUserRoleNamesByUserId(userId: Id): Promise<Array<{ name: string; }>> {
+    public getUserRoleNamesByUserId = async (userId: Id): Promise<Array<{ name: string; }>> => {
         const getUserRolesQuery: QueryString = `
             SELECT r.name 
             FROM user_roles ur
@@ -73,17 +73,17 @@ export class UserRepository extends Repository {
         `;
         const userRoles: Array<{ name: string; }> = await this.database.query(getUserRolesQuery, [userId]);
         return userRoles;
-    }
+    };
 
-    public async getUserIdByUsername(username: string): Promise<Nullable<{ id: Id; }>> {
+    public getUserIdByUsername = async (username: string): Promise<Nullable<{ id: Id; }>> => {
         const getDuplicateQuery: QueryString = "SELECT id FROM users WHERE username = $1";
         const duplicateUserId: Nullable<{ id: Id; }> = await this.database.queryOne(getDuplicateQuery, [username]);
         return duplicateUserId;
-    }
+    };
 
-    public async getIdByEmail(email: string): Promise<Nullable<{ id: Id; }>> {
+    public getIdByEmail = async (email: string): Promise<Nullable<{ id: Id; }>> => {
         const getDuplicateQuery: QueryString = "SELECT id FROM users WHERE email = $1";
         const duplicateUserId: Nullable<{ id: Id; }> = await this.database.queryOne(getDuplicateQuery, [email]);
         return duplicateUserId;
-    }
+    };
 }

@@ -20,23 +20,23 @@ export class UserController extends Controller {
         this.authJwtMiddleware = authJwtMiddleware;
     }
 
-    public async handleAllContent(req: Request, res: Response): Promise<void> {
+    public handleAllContent = async (req: Request, res: Response): Promise<void> => {
         this.sendSuccess(res, undefined, "all content");
-    }
+    };
 
-    public async handleUserContent(req: Request, res: Response): Promise<void> {
+    public handleUserContent = async (req: Request, res: Response): Promise<void> => {
         this.sendSuccess(res, undefined, "user content");
-    }
+    };
 
-    public async handleAdminContent(req: Request, res: Response): Promise<void> {
+    public handleAdminContent = async (req: Request, res: Response): Promise<void> => {
         this.sendSuccess(res, undefined, "admin content");
-    }
+    };
 
-    public async handleModeratorContent(req: Request, res: Response): Promise<void> {
+    public handleModeratorContent = async (req: Request, res: Response): Promise<void> => {
         this.sendSuccess(res, undefined, "moderator content");
-    }
+    };
 
-    public async handleGetUserInfo(req: Request, res: Response): Promise<void> {
+    public handleGetUserInfo = async (req: Request, res: Response): Promise<void> => {
         const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(req.id);
 
         if (!userInfo) {
@@ -45,20 +45,20 @@ export class UserController extends Controller {
         }
 
         this.sendSuccess(res, userInfo, "user base info");
-    }
+    };
 
     protected get routes(): IControllerRoute[] {
         const routes: IControllerRoute[] = [
             {
                 path: "/all",
                 method: HttpMethod.Get,
-                handler: this.handleAllContent.bind(this),
+                handler: this.handleAllContent,
                 localMiddleware: []
             },
             {
                 path: "/user",
                 method: HttpMethod.Get,
-                handler: this.handleUserContent.bind(this),
+                handler: this.handleUserContent,
                 localMiddleware: [
                     this.authJwtMiddleware.verifyToken
                 ]
@@ -66,7 +66,7 @@ export class UserController extends Controller {
             {
                 path: "/userbaseinfo",
                 method: HttpMethod.Get,
-                handler: this.handleGetUserInfo.bind(this),
+                handler: this.handleGetUserInfo,
                 localMiddleware: [
                     this.authJwtMiddleware.verifyToken
                 ]
@@ -74,7 +74,7 @@ export class UserController extends Controller {
             {
                 path: "/admin",
                 method: HttpMethod.Get,
-                handler: this.handleAdminContent.bind(this),
+                handler: this.handleAdminContent,
                 localMiddleware: [
                     this.authJwtMiddleware.verifyToken,
                     this.authJwtMiddleware.isAdmin
@@ -83,7 +83,7 @@ export class UserController extends Controller {
             {
                 path: "/moderator",
                 method: HttpMethod.Get,
-                handler: this.handleModeratorContent.bind(this),
+                handler: this.handleModeratorContent,
                 localMiddleware: [
                     this.authJwtMiddleware.verifyToken,
                     this.authJwtMiddleware.isModerator
