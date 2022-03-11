@@ -1,7 +1,7 @@
 import { UserRole } from "./controllers/user/types";
 import { Environment } from "./types";
 export class Constants {
-    static readonly logLevels = {
+    public static readonly logLevels = {
         error: 0,
         warn: 1,
         info: 2,
@@ -9,7 +9,7 @@ export class Constants {
         debug: 4
     };
 
-    static readonly logColors = {
+    public static readonly logColors = {
         error: "red",
         warn: "yellow",
         info: "green",
@@ -17,8 +17,8 @@ export class Constants {
         debug: "cyan"
     };
 
-    static readonly userRoles: UserRole[] = Object.values(UserRole);
+    public static readonly userRoles: UserRole[] = Object.values(UserRole);
 
-    static readonly environments: Environment[] = Object.values(Environment);
+    public static readonly environments: Environment[] = Object.values(Environment);
 
 }

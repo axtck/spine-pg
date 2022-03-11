@@ -8,8 +8,8 @@ import path from "path";
 
 @injectable()
 export class Logger {
-    private levels = Constants.logLevels;
-    private colors = Constants.logColors;
+    private readonly levels = Constants.logLevels;
+    private readonly colors = Constants.logColors;
 
     constructor() {
         winston.addColors(this.colors);
@@ -20,7 +20,7 @@ export class Logger {
         return penv.app.environment === Environment.Development ? "debug" : "info";
     }
 
-    private format = winston.format.combine(
+    private readonly format: winston.Logform.Format = winston.format.combine(
         winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
         winston.format.colorize({ level: true }),
         winston.format.printf(({ timestamp, level, message }) => {
@@ -28,7 +28,7 @@ export class Logger {
         })
     );
 
-    private transports = [
+    private readonly transports = [
         new winston.transports.Console(),
         new winston.transports.File({
             filename: path.join(".", "log", "error.log"),
@@ -37,30 +37,30 @@ export class Logger {
         new winston.transports.File({ filename: path.join(".", "log", "all.log") })
     ];
 
-    private logger = winston.createLogger({
+    private readonly logger: winston.Logger = winston.createLogger({
         level: this.level,
         levels: this.levels,
         format: this.format,
         transports: this.transports
     });
 
-    error(message: LogMessageTypes): void {
+    public error = (message: LogMessageTypes): void => {
         this.logger.error(message);
-    }
+    };
 
-    warn(message: LogMessageTypes): void {
+    public warn = (message: LogMessageTypes): void => {
         this.logger.warn(message);
-    }
+    };
 
-    info(message: LogMessageTypes): void {
+    public info = (message: LogMessageTypes): void => {
         this.logger.info(message);
-    }
+    };
 
-    http(message: LogMessageTypes): void {
+    public http = (message: LogMessageTypes): void => {
         this.logger.http(message);
-    }
+    };
 
-    debug(message: LogMessageTypes): void {
+    public debug = (message: LogMessageTypes): void => {
         this.logger.debug(message);
-    }
+    };
 }
