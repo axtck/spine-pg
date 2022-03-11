@@ -34,7 +34,7 @@ export class AuthController extends Controller {
             await this.userService.createUser(req.body.username, req.body.email, req.body.password);
             await this.userService.assignRoles(req.body.username, req.body.roles);
 
-            this.sendSuccess(res, undefined, `user '${req.body.username}' succesfully created`);
+            this.sendCreated(res, "user succesfully created", { username: req.body.username });
         } catch (e) {
             if (e instanceof Error) {
                 next(ApiError.internal(`signup failed: ${e.message}`));
@@ -49,13 +49,13 @@ export class AuthController extends Controller {
         try {
             const user: Nullable<IUserCredentials> = await this.userService.getUserByUsername(req.body.username);
             if (!user) {
-                next(ApiError.unauthorized(`user '${req.body.username}' not found`));
+                next(ApiError.unauthorized("user not found", { username: req.body.username }));
                 return;
             }
 
             const passwordIsValid: boolean = this.authService.validatePassword(req.body.password, user.password);
             if (!passwordIsValid) {
-                next(ApiError.unauthorized(`invalid password for user '${req.body.username}'`));
+                next(ApiError.unauthorized("invalid password attempt", { username: req.body.username }));
                 return;
             }
 
@@ -70,7 +70,7 @@ export class AuthController extends Controller {
                 accessToken: token
             };
 
-            this.sendSuccess(res, loginResponse, `user '${user.username}' successfully logged in`);
+            this.sendOk(res, loginResponse, "user successfully logged in");
         } catch (e) {
             if (e instanceof Error) {
                 next(ApiError.internal(`login failed: ${e.message}`));
@@ -88,8 +88,10 @@ export class AuthController extends Controller {
                 method: HttpMethod.Post,
                 handler: this.handleSignup,
                 localMiddleware: [
-                    this.verifySignupMiddleware.checkDuplicateUsernameOrEmail,
-                    this.verifySignupMiddleware.checkRolesExisted
+                    this.verifySignupMiddleware.validateEmailFormat, // 1: validate email format
+                    this.verifySignupMiddleware.checkDuplicateUsernameOrEmail, // 2: check if already exists
+                    this.verifySignupMiddleware.validatePasswordFormat, // 3: valiate password strength
+                    this.verifySignupMiddleware.checkRolesExisted // 4: validate roles
                 ]
             },
             {
