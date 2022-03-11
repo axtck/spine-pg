@@ -1,3 +1,4 @@
+import { HttpStatusCode, HttpStatusName } from "./../lib/errors/types";
 import { Logger } from "./Logger";
 import { Response, Router } from "express";
 import { HttpMethod } from "../types";
@@ -40,10 +41,17 @@ export abstract class Controller {
         return this.router;
     };
 
-    protected sendSuccess = (res: Response, data?: unknown, message?: string): Response => {
-        return res.status(200).json({
-            message: message || "success",
-            payload: data
+    protected sendOk = (res: Response, data?: unknown, message?: string): Response => {
+        return res.status(HttpStatusCode.Ok).json({
+            message: message || HttpStatusName.Ok,
+            data: data
+        });
+    };
+
+    protected sendCreated = (res: Response, message?: string, extra?: unknown): Response => {
+        return res.status(HttpStatusCode.Created).json({
+            message: message || HttpStatusName.Created,
+            extra: extra
         });
     };
 }
