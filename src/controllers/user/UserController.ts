@@ -1,6 +1,8 @@
+import { ApiError } from "./../../lib/errors/ApiError";
+import { Id } from "./../../types";
 import { Logger } from "../../core/Logger";
 import { AuthJwtMiddleware } from "../../middlewares/AuthJwtMiddleware";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { Controller } from "../../core/Controller";
 import { IControllerRoute } from "../types";
 import { HttpMethod, Nullable } from "../../types";
@@ -36,11 +38,12 @@ export class UserController extends Controller {
         this.sendOk(res, undefined, "moderator content");
     };
 
-    public handleGetUserInfo = async (req: Request, res: Response): Promise<void> => {
-        const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(req.id);
+    public handleGetUserInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const userId: Id = res.locals.userId;
+        const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(userId);
 
         if (!userInfo) {
-            this.sendOk(res, undefined, `no user found with id '${req.id}'`);
+            next(ApiError.notFound("no user info found", { user: userId }));
             return;
         }
 

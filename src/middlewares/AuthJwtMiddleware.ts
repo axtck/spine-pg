@@ -1,3 +1,4 @@
+import { Nullable } from "./../types";
 import { ApiError } from "./../lib/errors/ApiError";
 import { UserService } from "../controllers/user/services/UserService";
 import { Request, Response, NextFunction } from "express";
@@ -30,8 +31,7 @@ export class AuthJwtMiddleware extends Middleware {
                 next(ApiError.internal("decoding token failed"));
                 return;
             }
-
-            req.id = decoded.id;
+            res.locals.userId = decoded.id; // pass the decoded id value to the next middleware
             next();
         } catch (e) {
             next(ApiError.internal(`token authorization failed: ${e}`));
@@ -55,22 +55,24 @@ export class AuthJwtMiddleware extends Middleware {
     };
 
     public isAdmin = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-        if (!req.id) {
+        const userId: Nullable<Id> = res.locals.id;
+        if (!userId) {
             next(ApiError.forbidden("no id in request"));
             return;
         }
 
-        const userRoleNames = await this.userService.getUserRoleNames(req.id);
-        this.authenticateRole(req.id, userRoleNames, "admin", next);
+        const userRoleNames = await this.userService.getUserRoleNames(userId);
+        this.authenticateRole(userId, userRoleNames, "admin", next);
     };
 
     public isModerator = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-        if (!req.id) {
+        const userId: Nullable<Id> = res.locals.id;
+        if (!userId) {
             next(ApiError.forbidden("no id in request"));
             return;
         }
 
-        const userRoleNames = await this.userService.getUserRoleNames(req.id);
-        this.authenticateRole(req.id, userRoleNames, "moderator", next);
+        const userRoleNames = await this.userService.getUserRoleNames(userId);
+        this.authenticateRole(userId, userRoleNames, "moderator", next);
     };
 }

@@ -18,7 +18,5 @@ export class Constants {
     };
 
     public static readonly userRoles: UserRole[] = Object.values(UserRole);
-
     public static readonly environments: Environment[] = Object.values(Environment);
-
 }

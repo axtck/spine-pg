@@ -4,6 +4,7 @@ export enum HttpStatusCode {
     BadRequest = 400,
     Unauthorized = 401,
     Forbidden = 403,
+    NotFound = 404,
     Internal = 500
 }
 
@@ -13,5 +14,6 @@ export enum HttpStatusName {
     BadRequest = "Bad Request",
     Unauthorized = "Unauthorized",
     Forbidden = "Forbidden",
+    NotFound = "Not Found",
     Internal = "Internal"
 }
