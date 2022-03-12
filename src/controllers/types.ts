@@ -6,7 +6,7 @@ export interface ILoginResponse {
     username: string;
     email: string;
     roles: string[];
-    accessToken: unknown;
+    accessToken: string;
 }
 
 export interface IControllerRoute {

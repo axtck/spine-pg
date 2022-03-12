@@ -59,7 +59,7 @@ export class AuthController extends Controller {
                 return;
             }
 
-            const token: unknown = this.authService.signToken(user.id, penv.auth.jwtAuthkey);
+            const token: string = this.authService.signToken(user.id, penv.auth.jwtAuthkey);
             const userRoles: string[] = await this.userService.getUserRoleNames(user.id);
 
             const loginResponse: ILoginResponse = {

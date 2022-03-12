@@ -14,18 +14,17 @@ export class AuthService extends Service {
 
     public validatePassword = (passwordToValidate: string, passwordToCompareTo: string): boolean => {
         // compare the input passwords with the existing password using bcrypt
-        const passwordIsValid: boolean = bcrypt.compareSync(
+        const isValid: boolean = bcrypt.compareSync(
             passwordToValidate,
             passwordToCompareTo
         );
-        return passwordIsValid;
+        return isValid;
     };
 
-    public signToken = (userId: Id, jwtAuthKey: string | undefined): unknown => {
-        if (!jwtAuthKey) throw new Error("no JWT Authkey provided");
+    public signToken = (userId: Id, jwtAuthKey: string): string => {
         // sign a token that expires in 6hrs 
         const oneDayInS = 60 * 60 * 6;
-        const token = jwt.sign({ id: userId }, jwtAuthKey, {
+        const token = jwt.sign({ sub: userId }, jwtAuthKey, {
             expiresIn: oneDayInS
         });
         return token;
@@ -41,7 +40,7 @@ export class AuthService extends Service {
     };
 
     public validatePasswordFormat = (password: string): boolean => {
-        const passwordRegex: RegExp = new RegExp(/(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/);
+        const passwordRegex: RegExp = new RegExp(/(?=^.{8,}$)(?=.*\d)(?=.*\W+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/);
         const valid: Nullable<RegExpMatchArray> = password.match(passwordRegex);
         if (!valid) return false;
         return true;
