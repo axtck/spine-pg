@@ -1,9 +1,10 @@
 import { Database } from "./Database";
-import { Application, ErrorRequestHandler, RequestHandler } from "express";
+import { Application, ErrorRequestHandler, RequestHandler, Router } from "express";
 import { Controller } from "./Controller";
 import { Logger } from "./Logger";
 import { penv } from "../config/penv";
 import http from "http";
+import path from "path";
 
 export default class Server {
     private readonly logger: Logger;
@@ -30,8 +31,9 @@ export default class Server {
 
     public loadControllers = (basePath: string, controllers: Controller[]): void => {
         for (const controller of controllers) {
-            const controllerPath = `${basePath}/${controller.path}`.replace(/\/+/g, "/"); // create the full base path e.g. api/v1/auth
-            this.app.use(controllerPath, controller.setRoutes());
+            const controllerPath: string = path.posix.join(basePath, controller.path).replace(/\/+/g, "/"); // create the full base path e.g. api/v1/auth
+            const controllerRouter: Router = controller.setRoutes(); // set all routes for controller
+            this.app.use(controllerPath, controllerRouter);
         }
     };
 

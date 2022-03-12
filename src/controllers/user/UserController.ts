@@ -21,30 +21,30 @@ export class UserController extends Controller {
     }
 
     public handleAllContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendSuccess(res, undefined, "all content");
+        this.sendOk(res, undefined, "all content");
     };
 
     public handleUserContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendSuccess(res, undefined, "user content");
+        this.sendOk(res, undefined, "user content");
     };
 
     public handleAdminContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendSuccess(res, undefined, "admin content");
+        this.sendOk(res, undefined, "admin content");
     };
 
     public handleModeratorContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendSuccess(res, undefined, "moderator content");
+        this.sendOk(res, undefined, "moderator content");
     };
 
     public handleGetUserInfo = async (req: Request, res: Response): Promise<void> => {
         const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(req.id);
 
         if (!userInfo) {
-            this.sendSuccess(res, undefined, `no user found with id '${req.id}'`);
+            this.sendOk(res, undefined, `no user found with id '${req.id}'`);
             return;
         }
 
-        this.sendSuccess(res, userInfo, "user base info");
+        this.sendOk(res, userInfo, "user base info");
     };
 
     protected get routes(): IControllerRoute[] {

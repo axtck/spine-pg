@@ -39,9 +39,9 @@ export class AuthJwtMiddleware extends Middleware {
         }
     };
 
-    private authenticateRole = (id: Id, userRoleNames: string[], role: string, next: NextFunction): void => {
+    private authenticateRole = (userId: Id, userRoleNames: string[], role: string, next: NextFunction): void => {
         if (!userRoleNames) {
-            next(ApiError.internal(`no roles found for user with id '${id}'`));
+            next(ApiError.internal("no roles found", { userId: userId }));
             return;
         }
 
@@ -50,7 +50,7 @@ export class AuthJwtMiddleware extends Middleware {
             return;
         }
 
-        next(ApiError.forbidden(`require '${role}' role`));
+        next(ApiError.forbidden("require role", { role: role }));
         return;
     };
 
