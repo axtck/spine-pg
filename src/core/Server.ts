@@ -1,12 +1,12 @@
 import { Database } from "./Database";
-import { Application, ErrorRequestHandler, RequestHandler, Router } from "express";
+import express, { Application, ErrorRequestHandler, RequestHandler, Router } from "express";
 import { Controller } from "./Controller";
 import { Logger } from "./Logger";
 import { penv } from "../config/penv";
 import http from "http";
 import path from "path";
 
-export default class Server {
+export class Server {
     private readonly logger: Logger;
     private readonly app: Application;
     private readonly database: Database;
@@ -27,6 +27,10 @@ export default class Server {
         for (const middleware of middlewares) {
             this.app.use(middleware);
         }
+    };
+
+    public serveStaticFiles = (): void => {
+        this.app.use("/images", express.static(penv.static.images.path));
     };
 
     public loadControllers = (basePath: string, controllers: Controller[]): void => {

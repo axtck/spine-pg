@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import express, { Application, RequestHandler } from "express";
-import Server from "./core/Server";
+import { Server } from "./core/Server";
 import { Database } from "./core/Database";
 import { Logger } from "./core/Logger";
 import { Controller } from "./core/Controller";
@@ -37,6 +37,7 @@ const controllers: Controller[] = [
 server.initDatabase(path.join(__dirname, "migrations")).then(() => {
     server.listEnv();
     server.loadGlobalMiddlewares(globalMiddleWares);
+    server.serveStaticFiles();
     server.loadControllers("/api/v1", controllers);
     server.loadErrorHandlingMiddleware(apiErrorHandler);
     server.listen();
