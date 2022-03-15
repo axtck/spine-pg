@@ -37,7 +37,7 @@ services:
     environment:
       # overwrite container specific environment variables separately
       - HOST_SERVER_PORT=${COMPOSE_SERVER_PORT} # docker is host inside docker env 
-      - PG_HOST=pg-main # pg-main (db) container is mysql host inside docker env 
+      - PG_HOST=pg-main # pg-main (db) container is pg host inside docker env 
       - PG_PORT=5432 # port is 5432 inside docker env 
     ports:
       - ${HOST_SERVER_PORT}:${COMPOSE_SERVER_PORT} # map to outside container

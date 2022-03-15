@@ -1,7 +1,18 @@
-node_modules/
-dist/
+# app
+node_modules
+dist
+
+# environment variables
 .env
-log/
-coverage/
-docker/volumes/mysql-main
-static/
+
+# logs
+log
+
+# test output
+coverage
+
+# docker volumes
+docker/volumes/pg-main
+
+# temporary dev files
+tmp/static
