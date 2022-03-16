@@ -38,9 +38,9 @@ CREATE TABLE spine.profile_pictures (
   "active" bool NOT NULL,
   "created" timestamp NOT NULL,
   "modified" timestamp NOT NULL,
-  "location" varchar(50) NOT NULL,
+  "file_location" varchar(200) NOT NULL,
   CONSTRAINT profile_pictures_pk PRIMARY KEY ("id"),
-  CONSTRAINT profile_pictures_un UNIQUE ("location")
+  CONSTRAINT profile_pictures_un UNIQUE ("file_location")
 );
 -- spine.profile_pictures foreign keys
 ALTER TABLE spine.profile_pictures
