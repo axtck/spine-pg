@@ -1,3 +1,5 @@
+import { profilePicturesMulterUpload } from "./../../lib/files/multer";
+import { ProfilePictureService } from "./services/ProfilePictureService";
 import { ApiError } from "./../../lib/errors/ApiError";
 import { Id } from "./../../types";
 import { Logger } from "../../core/Logger";
@@ -12,43 +14,10 @@ import { UserService } from "./services/UserService";
 
 @injectable()
 export class UserController extends Controller {
-    public path = "/content";
+    public path = "/user";
     private readonly userService: UserService;
+    private readonly profilePictureService: ProfilePictureService;
     private readonly authJwtMiddleware: AuthJwtMiddleware;
-
-    constructor(logger: Logger, userService: UserService, authJwtMiddleware: AuthJwtMiddleware) {
-        super(logger);
-        this.userService = userService;
-        this.authJwtMiddleware = authJwtMiddleware;
-    }
-
-    public handleAllContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendOk(res, undefined, "all content");
-    };
-
-    public handleUserContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendOk(res, undefined, "user content");
-    };
-
-    public handleAdminContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendOk(res, undefined, "admin content");
-    };
-
-    public handleModeratorContent = async (req: Request, res: Response): Promise<void> => {
-        this.sendOk(res, undefined, "moderator content");
-    };
-
-    public handleGetUserInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const userId: Id = res.locals.userId;
-        const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(userId);
-
-        if (!userInfo) {
-            next(ApiError.notFound("no user info found", { user: userId }));
-            return;
-        }
-
-        this.sendOk(res, userInfo, "user base info");
-    };
 
     protected get routes(): IControllerRoute[] {
         const routes: IControllerRoute[] = [
@@ -91,9 +60,74 @@ export class UserController extends Controller {
                     this.authJwtMiddleware.verifyToken,
                     this.authJwtMiddleware.isModerator
                 ]
+            },
+            {
+                path: "/profile-picture",
+                method: HttpMethod.Post,
+                handler: this.handleAddProfilePicture,
+                preParser: profilePicturesMulterUpload.single("file"),
+                localMiddleware: [
+                    this.authJwtMiddleware.verifyToken
+                ]
             }
         ];
 
         return routes;
     }
+
+    constructor(logger: Logger,
+        userService: UserService,
+        authJwtMiddleware: AuthJwtMiddleware,
+        profilePictureService: ProfilePictureService) {
+        super(logger);
+        this.userService = userService;
+        this.profilePictureService = profilePictureService;
+        this.authJwtMiddleware = authJwtMiddleware;
+    }
+
+
+    public handleAllContent = async (req: Request, res: Response): Promise<void> => {
+        this.sendOk(res, undefined, "all content");
+    };
+
+    public handleUserContent = async (req: Request, res: Response): Promise<void> => {
+        this.sendOk(res, undefined, "user content");
+    };
+
+    public handleAdminContent = async (req: Request, res: Response): Promise<void> => {
+        this.sendOk(res, undefined, "admin content");
+    };
+
+    public handleModeratorContent = async (req: Request, res: Response): Promise<void> => {
+        this.sendOk(res, undefined, "moderator content");
+    };
+
+    public handleGetUserInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const userId: Id = res.locals.userId;
+        const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(userId);
+
+        if (!userInfo) {
+            next(ApiError.notFound("no user info found", { user: userId }));
+            return;
+        }
+
+        this.sendOk(res, userInfo, "user base info");
+    };
+
+    public handleAddProfilePicture = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const userId: Id = res.locals.userId;
+            if (!req.file) throw new Error("no file provided in request");
+
+            await this.profilePictureService.createProfilePicture(userId, req.file);
+            this.sendCreated(res, "profile picture added", { userId: userId });
+        } catch (e) {
+            if (e instanceof Error) {
+                next(ApiError.internal(`uploading profile picture failed: ${e.message}`));
+                return;
+            }
+            next(ApiError.internal(`uploading profile picture failed: ${e}`));
+            return;
+        }
+    };
 }

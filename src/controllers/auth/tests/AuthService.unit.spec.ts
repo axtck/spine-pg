@@ -17,22 +17,22 @@ describe("AuthService", () => {
 
         it("should assign user role (user role specified)", async () => {
             await userService.assignRoles(dummyUser.username, [dummyUserRole.name]);
-            sinon.assert.calledWithExactly(authRepositoryStub.createUserRole, dummyUser.id, dummyUserRole.id);
+            sinon.assert.calledWithExactly(authRepositoryStub.insertUserRole, dummyUser.id, dummyUserRole.id);
         });
 
         it("should assign user role (no role in args)", async () => {
             await userService.assignRoles(dummyUser.username, null);
-            sinon.assert.calledWithExactly(authRepositoryStub.createUserRole, dummyUser.id, dummyUserRole.id);
+            sinon.assert.calledWithExactly(authRepositoryStub.insertUserRole, dummyUser.id, dummyUserRole.id);
         });
 
         it("should assign admin role (admin role specified)", async () => {
             await userService.assignRoles(dummyAdmin.username, [dummyAdminRole.name]);
-            sinon.assert.calledWithExactly(authRepositoryStub.createUserRole, dummyAdmin.id, dummyAdminRole.id);
+            sinon.assert.calledWithExactly(authRepositoryStub.insertUserRole, dummyAdmin.id, dummyAdminRole.id);
         });
 
         it("should assign moderator role (moderator role specified)", async () => {
             await userService.assignRoles(dummyModerator.username, [dummyModeratorRole.name]);
-            sinon.assert.calledWithExactly(authRepositoryStub.createUserRole, dummyModerator.id, dummyModeratorRole.id);
+            sinon.assert.calledWithExactly(authRepositoryStub.insertUserRole, dummyModerator.id, dummyModeratorRole.id);
         });
 
         it("should not assign role (no created user found)", async () => {

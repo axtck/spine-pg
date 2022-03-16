@@ -13,44 +13,44 @@ export class UserRepository extends Repository {
         super(logger, database);
     }
 
-    public createUser = async (username: string, email: string, password: string): Promise<void> => {
-        const createUserQuery: QueryString = `
+    public insertUser = async (username: string, email: string, password: string): Promise<void> => {
+        const insertUserQuery: QueryString = `
             INSERT INTO users 
             (username, email, password)
             VALUES ($1, $2, $3)  
         `;
-        await this.database.query(createUserQuery, [username, email, password]);
+        await this.database.query(insertUserQuery, [username, email, password]);
     };
 
-    public createUserRole = async (userId: Id, roleId: Id): Promise<void> => {
-        const createUserRoleQuery: QueryString = `
+    public insertUserRole = async (userId: Id, roleId: Id): Promise<void> => {
+        const insertUserRoleQuery: QueryString = `
             INSERT INTO user_roles 
             (user_id, role_id)
             VALUES ($1, $2)
         `;
-        await this.database.query(createUserRoleQuery, [userId, roleId]);
+        await this.database.query(insertUserRoleQuery, [userId, roleId]);
     };
 
-    public getCreatedUserIdByUsername = async (username: string): Promise<Nullable<{ id: Id; }>> => {
-        const getUserIdQuery: QueryString = "SELECT id FROM users WHERE username = $1";
-        const foundUser: Nullable<{ id: Id; }> = await this.database.queryOne(getUserIdQuery, [username]);
+    public selectCreatedUserIdByUsername = async (username: string): Promise<Nullable<{ id: Id; }>> => {
+        const selectUserIdQuery: QueryString = "SELECT id FROM users WHERE username = $1";
+        const foundUser: Nullable<{ id: Id; }> = await this.database.queryOne(selectUserIdQuery, [username]);
         return foundUser;
     };
 
-    public getRoleByName = async (role: string): Promise<Nullable<{ id: Id; }>> => {
-        const getRoleIdQuery: QueryString = "SELECT id FROM roles WHERE name = $1";
-        const foundRole: Nullable<{ id: Id; }> = await this.database.queryOne(getRoleIdQuery, [role]);
+    public selectRoleByName = async (role: string): Promise<Nullable<{ id: Id; }>> => {
+        const selectRoleIdQuery: QueryString = "SELECT id FROM roles WHERE name = $1";
+        const foundRole: Nullable<{ id: Id; }> = await this.database.queryOne(selectRoleIdQuery, [role]);
         return foundRole;
     };
 
-    public getUserByUsername = async (username: string): Promise<Nullable<IUserCredentials>> => {
-        const getUserQuery: QueryString = "SELECT * FROM users WHERE username = $1";
-        const user: Nullable<IUserCredentials> = await this.database.queryOne(getUserQuery, [username]);
+    public selectUserByUsername = async (username: string): Promise<Nullable<IUserCredentials>> => {
+        const selectUserQuery: QueryString = "SELECT * FROM users WHERE username = $1";
+        const user: Nullable<IUserCredentials> = await this.database.queryOne(selectUserQuery, [username]);
         return user;
     };
 
-    public getBaseById = async (id: Id): Promise<Nullable<IUserBaseDao>> => {
-        const getBaseByIdQuery: QueryString = `
+    public selectBaseById = async (id: Id): Promise<Nullable<IUserBaseDao>> => {
+        const selectBaseByIdQuery: QueryString = `
             SELECT
                 id,
                 username,
@@ -60,30 +60,30 @@ export class UserRepository extends Repository {
             WHERE id = $1
         `;
 
-        const userBase: Nullable<IUserBaseDao> = await this.database.queryOne(getBaseByIdQuery, [id]);
+        const userBase: Nullable<IUserBaseDao> = await this.database.queryOne(selectBaseByIdQuery, [id]);
         return userBase;
     };
 
-    public getUserRoleNamesByUserId = async (userId: Id): Promise<Array<{ name: string; }>> => {
-        const getUserRolesQuery: QueryString = `
+    public selectUserRoleNamesByUserId = async (userId: Id): Promise<Array<{ name: string; }>> => {
+        const selectUserRolesQuery: QueryString = `
             SELECT r.name 
             FROM user_roles ur
             INNER JOIN roles r ON r.id = ur.role_id
             WHERE ur.user_id = $1 
         `;
-        const userRoles: Array<{ name: string; }> = await this.database.query(getUserRolesQuery, [userId]);
+        const userRoles: Array<{ name: string; }> = await this.database.query(selectUserRolesQuery, [userId]);
         return userRoles;
     };
 
-    public getUserIdByUsername = async (username: string): Promise<Nullable<{ id: Id; }>> => {
-        const getDuplicateQuery: QueryString = "SELECT id FROM users WHERE username = $1";
-        const duplicateUserId: Nullable<{ id: Id; }> = await this.database.queryOne(getDuplicateQuery, [username]);
+    public selectUserIdByUsername = async (username: string): Promise<Nullable<{ id: Id; }>> => {
+        const selectDuplicateQuery: QueryString = "SELECT id FROM users WHERE username = $1";
+        const duplicateUserId: Nullable<{ id: Id; }> = await this.database.queryOne(selectDuplicateQuery, [username]);
         return duplicateUserId;
     };
 
-    public getIdByEmail = async (email: string): Promise<Nullable<{ id: Id; }>> => {
-        const getDuplicateQuery: QueryString = "SELECT id FROM users WHERE email = $1";
-        const duplicateUserId: Nullable<{ id: Id; }> = await this.database.queryOne(getDuplicateQuery, [email]);
+    public selectIdByEmail = async (email: string): Promise<Nullable<{ id: Id; }>> => {
+        const selectDuplicateQuery: QueryString = "SELECT id FROM users WHERE email = $1";
+        const duplicateUserId: Nullable<{ id: Id; }> = await this.database.queryOne(selectDuplicateQuery, [email]);
         return duplicateUserId;
     };
 }

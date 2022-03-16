@@ -25,6 +25,10 @@ export abstract class Controller {
                     this.router.get(route.path, route.handler);
                     break;
                 case HttpMethod.Post:
+                    if (route.preParser) {
+                        this.router.post(route.path, route.preParser, route.handler);
+                        break;
+                    }
                     this.router.post(route.path, route.handler);
                     break;
                 case HttpMethod.Put:

@@ -10,28 +10,28 @@ import {
 const authRepositoryStub: SinonStubbedInstance<UserRepository> = sinon.createStubInstance(UserRepository);
 
 // get created user id
-authRepositoryStub.getCreatedUserIdByUsername.withArgs(dummyUser.username).resolves({ id: dummyUser.id });
-authRepositoryStub.getCreatedUserIdByUsername.withArgs(dummyAdmin.username).resolves({ id: dummyAdmin.id });
-authRepositoryStub.getCreatedUserIdByUsername.withArgs(dummyModerator.username).resolves({ id: dummyModerator.id });
-authRepositoryStub.getCreatedUserIdByUsername.withArgs("").resolves(null); // test exception handling 
+authRepositoryStub.selectCreatedUserIdByUsername.withArgs(dummyUser.username).resolves({ id: dummyUser.id });
+authRepositoryStub.selectCreatedUserIdByUsername.withArgs(dummyAdmin.username).resolves({ id: dummyAdmin.id });
+authRepositoryStub.selectCreatedUserIdByUsername.withArgs(dummyModerator.username).resolves({ id: dummyModerator.id });
+authRepositoryStub.selectCreatedUserIdByUsername.withArgs("").resolves(null); // test exception handling 
 
 // get role
-authRepositoryStub.getRoleByName.withArgs(dummyUserRole.name).resolves({ id: dummyUserRole.id });
-authRepositoryStub.getRoleByName.withArgs(dummyAdminRole.name).resolves({ id: dummyAdminRole.id });
-authRepositoryStub.getRoleByName.withArgs(dummyModeratorRole.name).resolves({ id: dummyModeratorRole.id });
-authRepositoryStub.getRoleByName.withArgs("").resolves(null);
+authRepositoryStub.selectRoleByName.withArgs(dummyUserRole.name).resolves({ id: dummyUserRole.id });
+authRepositoryStub.selectRoleByName.withArgs(dummyAdminRole.name).resolves({ id: dummyAdminRole.id });
+authRepositoryStub.selectRoleByName.withArgs(dummyModeratorRole.name).resolves({ id: dummyModeratorRole.id });
+authRepositoryStub.selectRoleByName.withArgs("").resolves(null);
 
 // get user
-authRepositoryStub.getUserByUsername.withArgs(dummyUser.username).resolves(dummyUser);
-authRepositoryStub.getUserByUsername.withArgs(dummyAdmin.username).resolves(dummyAdmin);
-authRepositoryStub.getUserByUsername.withArgs(dummyModerator.username).resolves(dummyModerator);
-authRepositoryStub.getUserByUsername.withArgs("").resolves(null);
+authRepositoryStub.selectUserByUsername.withArgs(dummyUser.username).resolves(dummyUser);
+authRepositoryStub.selectUserByUsername.withArgs(dummyAdmin.username).resolves(dummyAdmin);
+authRepositoryStub.selectUserByUsername.withArgs(dummyModerator.username).resolves(dummyModerator);
+authRepositoryStub.selectUserByUsername.withArgs("").resolves(null);
 
 // get user roles
-authRepositoryStub.getUserRoleNamesByUserId.withArgs(dummyUser.id).resolves([{ name: dummyUserRole.name }]);
-authRepositoryStub.getUserRoleNamesByUserId.withArgs(dummyAdmin.id).resolves([{ name: dummyAdminRole.name }]);
-authRepositoryStub.getUserRoleNamesByUserId.withArgs(dummyModerator.id).resolves([{ name: dummyModeratorRole.name }]);
-authRepositoryStub.getUserRoleNamesByUserId.withArgs(0).resolves([]);
+authRepositoryStub.selectUserRoleNamesByUserId.withArgs(dummyUser.id).resolves([{ name: dummyUserRole.name }]);
+authRepositoryStub.selectUserRoleNamesByUserId.withArgs(dummyAdmin.id).resolves([{ name: dummyAdminRole.name }]);
+authRepositoryStub.selectUserRoleNamesByUserId.withArgs(dummyModerator.id).resolves([{ name: dummyModeratorRole.name }]);
+authRepositoryStub.selectUserRoleNamesByUserId.withArgs(0).resolves([]);
 
 export {
     authRepositoryStub

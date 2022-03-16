@@ -8,7 +8,7 @@ if (process.env.NODE_ENV && !Constants.environments.includes(process.env.NODE_EN
 }
 
 if (!process.env.JWT_AUTHKEY) throw new Error("no JWT authkey provided");
-if (!process.env.IMAGES_PATH) throw new Error("no static images path provided");
+if (!process.env.PROFILE_PICTURES_PATH) throw new Error("no static images path provided");
 
 const environement: string = process.env.NODE_ENV || "development";
 export const penv = {
@@ -29,7 +29,9 @@ export const penv = {
     },
     static: {
         images: {
-            path: process.env.IMAGES_PATH
+            paths: {
+                profilePictures: process.env.PROFILE_PICTURES_PATH
+            }
         }
     }
 };

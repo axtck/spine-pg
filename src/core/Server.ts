@@ -30,7 +30,7 @@ export class Server {
     };
 
     public serveStaticFiles = (): void => {
-        this.app.use("/images", express.static(penv.static.images.path));
+        this.app.use("/images", express.static(penv.static.images.paths.profilePictures));
     };
 
     public loadControllers = (basePath: string, controllers: Controller[]): void => {
