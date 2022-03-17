@@ -1,38 +1,39 @@
+import { IResizeDimensions } from "./../../../core/services/types";
+import { FileService } from "../../../core/services/FileService";
 import { Id } from "./../../../types";
 import { Logger } from "./../../../core/Logger";
 import { ProfilePictureRepository } from "./../repositories/ProfilePictureRepository";
 import { Service } from "../../../core/Service";
 import { injectable } from "tsyringe";
 import path from "path";
-import fs from "fs/promises";
-import sharp from "sharp";
 
 @injectable()
 export class ProfilePictureService extends Service {
     private readonly profilePictureRepository: ProfilePictureRepository;
+    private readonly fileService: FileService;
 
-    constructor(logger: Logger, profilePictureRepository: ProfilePictureRepository) {
+    constructor(logger: Logger, profilePictureRepository: ProfilePictureRepository, fileService: FileService) {
         super(logger);
         this.profilePictureRepository = profilePictureRepository;
+        this.fileService = fileService;
     }
 
     public createProfilePicture = async (userId: Id, file: Express.Multer.File): Promise<void> => {
-        // TODO: add more validation & clean up
-        if (path.extname(file.originalname).toLowerCase() !== ".jpg") {
-            throw new Error("bad file type");
+        // validate file
+        const imageExtension: string = path.extname(file.originalname).toLowerCase();
+        if (!this.fileService.isImageExtension(imageExtension)) {
+            throw new Error(`bad filetype: ${imageExtension}`);
         }
 
-        const targetPath = `${file.path}-pp-${userId}.jpeg`;
+        // config 
+        const targetPath: string = `${this.fileService.convertToPosixPath(file.path)}.jpeg`; // force posix path and add extension
+        const resizeDimensions: IResizeDimensions = {
+            width: 180,
+            heigth: 180
+        };
 
-        await this.resizeAndSaveProfilePicture(file.path, targetPath); // process
-        await fs.unlink(file.path); // remove the old file from disk
-        await this.profilePictureRepository.insertProfilePicture(userId, targetPath); // add db record
-    };
-
-    private resizeAndSaveProfilePicture = async (inputFilePath: string, outputFilePath: string): Promise<void> => {
-        await sharp(inputFilePath)
-            .resize(180, 180) // resize image to 180 x 180
-            .jpeg({ quality: 90 }) // convert to jpeg
-            .toFile(outputFilePath); // write to disk
+        // process file and add record to database
+        await this.fileService.resizeAndOverwriteProfilePicture(file.path, targetPath, resizeDimensions);
+        await this.profilePictureRepository.insertProfilePicture(userId, targetPath);
     };
 }

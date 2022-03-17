@@ -1,3 +1,4 @@
+import { AuthJwtMiddleware } from "./../middlewares/AuthJwtMiddleware";
 import { Database } from "./Database";
 import express, { Application, ErrorRequestHandler, RequestHandler, Router } from "express";
 import { Controller } from "./Controller";
@@ -10,11 +11,13 @@ export class Server {
     private readonly logger: Logger;
     private readonly app: Application;
     private readonly database: Database;
+    private readonly authJwtMiddleware: AuthJwtMiddleware;
 
-    constructor(logger: Logger, app: Application, database: Database) {
+    constructor(logger: Logger, app: Application, database: Database, authJwtMiddleware: AuthJwtMiddleware) {
         this.logger = logger;
         this.app = app;
         this.database = database;
+        this.authJwtMiddleware = authJwtMiddleware;
     }
 
     public listen = (): http.Server => {
@@ -30,6 +33,7 @@ export class Server {
     };
 
     public serveStaticFiles = (): void => {
+        this.app.use("/images", this.authJwtMiddleware.verifyToken);
         this.app.use("/images", express.static(penv.static.images.paths.profilePictures));
     };
 

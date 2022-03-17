@@ -1,9 +1,8 @@
 import dotenv from "dotenv";
 import { Constants } from "./../Constants";
-import { Environment } from "./../types";
 dotenv.config();
 
-if (process.env.NODE_ENV && !Constants.environments.includes(process.env.NODE_ENV as Environment)) {
+if (process.env.NODE_ENV && !Constants.environmentStringValues.includes(process.env.NODE_ENV)) {
     throw new Error(`environment '${process.env.NODE_ENV}' invalid, possible environments: undefined (development) - development - test - staging - production`);
 }
 

@@ -1,6 +1,5 @@
 import { AuthService } from "./../controllers/auth/AuthService";
 import { Constants } from "./../Constants";
-import { UserRole } from "../controllers/user/types";
 import { ApiError } from "./../lib/errors/ApiError";
 import { UserService } from "../controllers/user/services/UserService";
 import { Request, Response, NextFunction } from "express";
@@ -53,7 +52,7 @@ export class VerifySignupMiddleware extends Middleware {
     };
 
     public checkRolesExisted = (req: Request, res: Response, next: NextFunction): void => {
-        const roleNames: UserRole[] = Constants.userRoles;
+        const roleNames: string[] = Constants.userRoleStringValues;
         if (req.body.roles?.length) {
             for (const role of req.body.roles) {
                 if (!roleNames.includes(role)) {
