@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import express, { Application, RequestHandler } from "express";
+import { penv } from "./config/penv";
 import { Server } from "./core/Server";
 import { Logger } from "./core/Logger";
 import { Database } from "./core/Database";
@@ -24,7 +25,7 @@ const server: Server = new Server(logger, app, database, authJwtMiddleware);
 const globalMiddleWares: RequestHandler[] = [
     morgan("dev"),
     helmet(),
-    cors({ origin: "http://localhost:3000" }), // access for origin 3000 (front-end)
+    cors({ origin: penv.cors.origin }), // access for origin
     express.json(), // parse requests
     express.urlencoded({ extended: true })
 ];
