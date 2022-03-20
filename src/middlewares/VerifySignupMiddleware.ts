@@ -19,8 +19,7 @@ export class VerifySignupMiddleware extends Middleware {
 
     public validateEmailFormat = (req: Request, res: Response, next: NextFunction): void => {
         if (!this.authService.validateEmailFormat(req.body.email)) {
-            next(ApiError.badRequest("email does not meet the expectations", { email: req.body.email }));
-            return;
+            return next(ApiError.badRequest("email does not meet the expectations", { email: req.body.email }));
         }
 
         next();
@@ -28,8 +27,7 @@ export class VerifySignupMiddleware extends Middleware {
 
     public validatePasswordFormat = (req: Request, res: Response, next: NextFunction): void => {
         if (!this.authService.validatePasswordFormat(req.body.password)) {
-            next(ApiError.badRequest("password too weak"));
-            return;
+            return next(ApiError.badRequest("password not strong enough"));
         }
 
         next();
@@ -38,14 +36,12 @@ export class VerifySignupMiddleware extends Middleware {
     public checkDuplicateUsernameOrEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const duplicateUsername = await this.userService.getDuplicateUsernameId(req.body.username);
         if (duplicateUsername) {
-            next(ApiError.badRequest("username already in use", { username: req.body.username }));
-            return;
+            return next(ApiError.badRequest("username already in use", { username: req.body.username }));
         }
 
         const duplicateEmail = await this.userService.getDuplicateEmailId(req.body.email);
         if (duplicateEmail) {
-            next(ApiError.badRequest("email already in use", { email: req.body.email }));
-            return;
+            return next(ApiError.badRequest("email already in use", { email: req.body.email }));
         }
 
         next();
@@ -56,8 +52,7 @@ export class VerifySignupMiddleware extends Middleware {
         if (req.body.roles?.length) {
             for (const role of req.body.roles) {
                 if (!roleNames.includes(role)) {
-                    next(ApiError.badRequest("invalid role", { role: role }));
-                    return;
+                    return next(ApiError.badRequest("invalid role", { role: role }));
                 }
             }
         }

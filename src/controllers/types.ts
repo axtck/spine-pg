@@ -13,6 +13,5 @@ export interface IControllerRoute {
     path: string;
     method: HttpMethod;
     handler: RequestHandler;
-    preParser?: any; // TODO: check out typing
     localMiddleware: RequestHandler[];
 }

@@ -15,6 +15,9 @@ export const penv = {
         port: Number(process.env.HOST_SERVER_PORT) || 3001,
         environment: environement
     },
+    cors: {
+        origin: process.env.CORS_ALLOW_ORIGIN
+    },
     db: {
         pgHost: process.env.PG_HOST,
         pgPort: Number(process.env.PG_PORT) || undefined,

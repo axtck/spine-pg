@@ -65,9 +65,9 @@ export class UserController extends Controller {
                 path: "/profile-picture",
                 method: HttpMethod.Post,
                 handler: this.handleAddProfilePicture,
-                preParser: profilePicturesMulterUpload.single("file"),
                 localMiddleware: [
-                    this.authJwtMiddleware.verifyToken
+                    this.authJwtMiddleware.verifyToken,
+                    profilePicturesMulterUpload.single("file")
                 ]
             }
         ];
@@ -103,15 +103,17 @@ export class UserController extends Controller {
     };
 
     public handleGetUserInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const userId: Id = res.locals.userId;
-        const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(userId);
+        try {
+            const userId: Id = res.locals.userId;
+            const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(userId);
 
-        if (!userInfo) {
-            next(ApiError.notFound("no user info found", { user: userId }));
-            return;
+            if (!userInfo) return next(ApiError.notFound("no user info found", { user: userId }));
+
+            this.sendOk(res, userInfo, "user base info");
+        } catch (e) {
+            if (e instanceof Error) return next(ApiError.internal(`getting user info failed: ${e.message}`));
+            return next(ApiError.internal(`getting user info failed: ${e}`));
         }
-
-        this.sendOk(res, userInfo, "user base info");
     };
 
     public handleAddProfilePicture = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -122,12 +124,8 @@ export class UserController extends Controller {
             await this.profilePictureService.createProfilePicture(userId, req.file);
             this.sendCreated(res, "profile picture added", { userId: userId });
         } catch (e) {
-            if (e instanceof Error) {
-                next(ApiError.internal(`uploading profile picture failed: ${e.message}`));
-                return;
-            }
-            next(ApiError.internal(`uploading profile picture failed: ${e}`));
-            return;
+            if (e instanceof Error) return next(ApiError.internal(`uploading profile picture failed: ${e.message}`));
+            return next(ApiError.internal(`uploading profile picture failed: ${e}`));
         }
     };
 }
