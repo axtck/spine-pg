@@ -1,10 +1,14 @@
-import { IResizeDimensions } from "./../../../core/services/types";
+import { ProfilePictureDaoMapper } from "./../repositories/ProfilePictureDaoMapper";
+import { IProfilePicture } from "./../models/ProfilePicture";
+import { IProfilePictureDao } from "./../daos/ProfilePictureDao";
+import { IFileParts, IResizeDimensions } from "./../../../core/services/types";
 import { FileService } from "../../../core/services/FileService";
-import { Id } from "./../../../types";
+import { Id, Nullable } from "./../../../types";
 import { Logger } from "./../../../core/Logger";
 import { ProfilePictureRepository } from "./../repositories/ProfilePictureRepository";
 import { Service } from "../../../core/Service";
 import { injectable } from "tsyringe";
+import { IInsertProfilePictureData } from "../types";
 import path from "path";
 
 @injectable()
@@ -25,15 +29,36 @@ export class ProfilePictureService extends Service {
             throw new Error(`bad filetype: ${imageExtension}`);
         }
 
-        // config 
+        // process file
         const targetPath: string = `${this.fileService.convertToPosixPath(file.path)}.jpeg`; // force posix path and add extension
         const resizeDimensions: IResizeDimensions = {
             width: 180,
             heigth: 180
         };
-
-        // process file and add record to database
         await this.fileService.resizeAndOverwriteProfilePicture(file.path, targetPath, resizeDimensions);
-        await this.profilePictureRepository.insertProfilePicture(userId, targetPath);
+
+        // add record to database
+        const fileParts: IFileParts = this.fileService.splitFileAndExtension(targetPath);
+        const insertData: IInsertProfilePictureData = {
+            userId: userId,
+            active: true,
+            filename: fileParts.filename,
+            extension: fileParts.extension,
+            fileLocation: targetPath,
+            created: new Date(),
+            modified: new Date()
+        };
+
+        await this.profilePictureRepository.insertProfilePicture(insertData);
+        const insertedPicture: Nullable<{ id: Id; }> = await this.profilePictureRepository.getOneByFileName(fileParts.filename);
+        if (!insertedPicture?.id) throw new Error("finding inserted image failed");
+        await this.profilePictureRepository.setActive(insertedPicture.id, userId);
+    };
+
+    public getByUserId = async (userId: Id): Promise<IProfilePicture[]> => {
+        const profilePictureDaos: IProfilePictureDao[] = await this.profilePictureRepository.getByUserId(userId);
+        const profilePictures: IProfilePicture[] = profilePictureDaos.map((dao) => ProfilePictureDaoMapper.toModel(dao));
+
+        return profilePictures;
     };
 }

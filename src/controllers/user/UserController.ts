@@ -69,6 +69,14 @@ export class UserController extends Controller {
                     this.authJwtMiddleware.verifyToken,
                     profilePicturesMulterUpload.single("file")
                 ]
+            },
+            {
+                path: "/profile-picture",
+                method: HttpMethod.Get,
+                handler: this.handleGetProfilePictures,
+                localMiddleware: [
+                    this.authJwtMiddleware.verifyToken
+                ]
             }
         ];
 
@@ -126,6 +134,17 @@ export class UserController extends Controller {
         } catch (e) {
             if (e instanceof Error) return next(ApiError.internal(`uploading profile picture failed: ${e.message}`));
             return next(ApiError.internal(`uploading profile picture failed: ${e}`));
+        }
+    };
+
+    public handleGetProfilePictures = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const userId: Id = res.locals.userId;
+            const profilePictures = await this.profilePictureService.getByUserId(userId);
+            this.sendOk(res, profilePictures);
+        } catch (e) {
+            if (e instanceof Error) return next(ApiError.internal(`getting profile pictures failed: ${e.message}`));
+            return next(ApiError.internal(`getting profile pictures failed: ${e}`));
         }
     };
 }

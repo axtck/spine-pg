@@ -17,3 +17,13 @@ export interface IRole {
     id: Id;
     name: UserRole;
 }
+
+export interface IInsertProfilePictureData {
+    userId: Id;
+    active: boolean;
+    filename: string;
+    extension: string;
+    fileLocation: string;
+    created: Date;
+    modified: Date;
+}
