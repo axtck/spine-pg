@@ -2,10 +2,13 @@ import { Constants } from "./../../../Constants";
 import { UserRole } from "./../types";
 import { IUserDao } from "./../daos/UserDao";
 import { IUser } from "../models/User";
+import { isOfEnumArray } from "../../../lib/utils/verification";
 
 export class UserDaoMapper {
     public static toModel = (userDao: IUserDao): IUser => {
-        if (!this.isRoles(userDao.roles)) throw new Error(`invalid roles '${userDao.roles.join(", ")}' for user with id '${userDao.id}'`);
+        if (!isOfEnumArray<UserRole>(userDao.roles, Constants.userRoleEnumValues)) {
+            throw new Error(`invalid roles '${userDao.roles.join(", ")}' for user with id '${userDao.id}'`);
+        }
 
         return {
             id: userDao.id,
@@ -13,13 +16,5 @@ export class UserDaoMapper {
             email: userDao.email,
             roles: userDao.roles
         };
-    };
-
-    private static isRoles = (roles: string[]): roles is UserRole[] => {
-        for (const role of roles) {
-            if (!Constants.userRoleStringValues.includes(role)) return false;
-        }
-
-        return true;
     };
 }

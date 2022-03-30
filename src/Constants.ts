@@ -17,6 +17,6 @@ export class Constants {
         debug: "cyan"
     };
 
-    public static readonly userRoleStringValues: string[] = Object.values<string>(UserRole);
-    public static readonly environmentStringValues: string[] = Object.values<string>(Environment);
+    public static readonly userRoleEnumValues: UserRole[] = Object.values(UserRole);
+    public static readonly environmentEnumValues: Environment[] = Object.values(Environment);
 }

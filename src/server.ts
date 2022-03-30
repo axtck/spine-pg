@@ -9,12 +9,12 @@ import { Controller } from "./core/Controller";
 import { AuthController } from "./controllers/auth/AuthController";
 import { UserController } from "./controllers/user/UserController";
 import { apiErrorHandler } from "./middlewares/apiErrorHandler";
-import { lazyHandleException } from "./lib/functions/exceptionHandling";
+import { lazyHandleException } from "./lib/utils/exceptionHandling";
 import { AuthJwtMiddleware } from "./middlewares/AuthJwtMiddleware";
+import { buildPathFromRoot } from "./lib/utils/paths";
 import morgan from "morgan";
 import helmet from "helmet";
 import cors from "cors";
-import path from "path";
 
 const app: Application = express();
 const logger: Logger = container.resolve(Logger);
@@ -37,7 +37,7 @@ const controllers: Controller[] = [
     userController
 ];
 
-server.initDatabase(path.join(__dirname, "migrations")).then(() => {
+server.initDatabase(buildPathFromRoot("src", "migrations")).then(() => {
     server.listEnv();
     server.loadGlobalMiddlewares(globalMiddleWares);
     server.serveStaticFiles();

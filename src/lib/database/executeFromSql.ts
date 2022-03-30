@@ -1,6 +1,6 @@
 import { Database } from "./../../core/Database";
 import { container } from "tsyringe";
-import { lazyHandleException } from "../functions/exceptionHandling";
+import { lazyHandleException } from "../utils/exceptionHandling";
 import { Logger } from "../../core/Logger";
 import fs from "fs";
 

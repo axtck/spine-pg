@@ -1,4 +1,4 @@
 import { ImageExtension } from "./types";
 export class Constants {
-    public static readonly imageExtensionStringValues: string[] = Object.values<string>(ImageExtension);
+    public static readonly imageExtensionEnumValues: ImageExtension[] = Object.values(ImageExtension);
 }

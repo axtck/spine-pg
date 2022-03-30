@@ -1,6 +1,6 @@
 import { container } from "tsyringe";
 import { penv } from "./../../config/penv";
-import { lazyHandleException } from "./../functions/exceptionHandling";
+import { lazyHandleException } from "../utils/exceptionHandling";
 import { Id, QueryString } from "./../../types";
 import { Database } from "./../../core/Database";
 import { readdir } from "fs/promises";
