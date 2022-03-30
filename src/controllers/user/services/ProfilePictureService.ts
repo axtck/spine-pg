@@ -61,4 +61,20 @@ export class ProfilePictureService extends Service {
 
         return profilePictures;
     };
+
+    public getOneById = async (id: Id): Promise<Nullable<IProfilePicture>> => {
+        const profilePictureDao: Nullable<IProfilePictureDao> = await this.profilePictureRepository.getOneById(id);
+        if (!profilePictureDao) return null;
+
+        const profilePictures: IProfilePicture = ProfilePictureDaoMapper.toModel(profilePictureDao);
+        return profilePictures;
+    };
+
+    public getActiveForUser = async (userId: Id): Promise<Nullable<IProfilePicture>> => {
+        const profilePictureDao: Nullable<IProfilePictureDao> = await this.profilePictureRepository.getActiveForUser(userId);
+        if (!profilePictureDao) return null;
+
+        const profilePictures: IProfilePicture = ProfilePictureDaoMapper.toModel(profilePictureDao);
+        return profilePictures;
+    };
 }

@@ -70,4 +70,26 @@ export class ProfilePictureRepository extends Repository {
         const picture: IProfilePictureDao[] = await this.database.query(getQuery, [userId]);
         return picture;
     };
+
+    public getOneById = async (id: Id): Promise<Nullable<IProfilePictureDao>> => {
+        const getQuery: QueryString = `
+            SELECT id, user_id, active, filename, extension, file_location, created, modified
+            FROM profile_pictures
+            WHERE id = $1
+        `;
+
+        const picture: Nullable<IProfilePictureDao> = await this.database.queryOne(getQuery, [id]);
+        return picture;
+    };
+
+    public getActiveForUser = async (userId: Id): Promise<Nullable<IProfilePictureDao>> => {
+        const getQuery: QueryString = `
+            SELECT id, user_id, active, filename, extension, file_location, created, modified
+            FROM profile_pictures
+            WHERE user_id = $1 and active = TRUE 
+        `;
+
+        const picture: Nullable<IProfilePictureDao> = await this.database.queryOne(getQuery, [userId]);
+        return picture;
+    };
 }

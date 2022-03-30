@@ -1,3 +1,4 @@
+import { IProfilePicture } from "./models/ProfilePicture";
 import { profilePicturesMulterUpload } from "./../../lib/files/multer";
 import { ProfilePictureService } from "./services/ProfilePictureService";
 import { ApiError } from "./../../lib/errors/ApiError";
@@ -71,9 +72,25 @@ export class UserController extends Controller {
                 ]
             },
             {
-                path: "/profile-picture",
+                path: "/profile-pictures",
                 method: HttpMethod.Get,
                 handler: this.handleGetProfilePictures,
+                localMiddleware: [
+                    this.authJwtMiddleware.verifyToken
+                ]
+            },
+            {
+                path: "/profile-picture/:id",
+                method: HttpMethod.Get,
+                handler: this.handleGetProfilePictureById,
+                localMiddleware: [
+                    this.authJwtMiddleware.verifyToken
+                ]
+            },
+            {
+                path: "/profile-picture/active",
+                method: HttpMethod.Get,
+                handler: this.handleGetActiveProfilePicture,
                 localMiddleware: [
                     this.authJwtMiddleware.verifyToken
                 ]
@@ -140,11 +157,40 @@ export class UserController extends Controller {
     public handleGetProfilePictures = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const userId: Id = res.locals.userId;
-            const profilePictures = await this.profilePictureService.getByUserId(userId);
+            const profilePictures: IProfilePicture[] = await this.profilePictureService.getByUserId(userId);
             this.sendOk(res, profilePictures);
         } catch (e) {
             if (e instanceof Error) return next(ApiError.internal(`getting profile pictures failed: ${e.message}`));
             return next(ApiError.internal(`getting profile pictures failed: ${e}`));
+        }
+    };
+
+    public handleGetProfilePictureById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const id: Nullable<Id> = parseInt(req.params.id) >= 0 ? parseInt(req.params.id) : null;
+            if (!id) return next(ApiError.badRequest("no id in request params"));
+
+            const profilePicture: Nullable<IProfilePicture> = await this.profilePictureService.getOneById(id);
+            if (!profilePicture) return next(ApiError.notFound("no profile picture found for id", { user: id }));
+
+            this.sendOk(res, profilePicture);
+        } catch (e) {
+            if (e instanceof Error) return next(ApiError.internal(`getting profile picture by id failed: ${e.message}`));
+            return next(ApiError.internal(`getting profile picture by id failed: ${e}`));
+        }
+    };
+
+    public handleGetActiveProfilePicture = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const userId: Id = res.locals.userId;
+            const profilePicture: Nullable<IProfilePicture> = await this.profilePictureService.getActiveForUser(userId);
+
+            if (!profilePicture) return next(ApiError.notFound("no active profile picture found", { user: userId }));
+
+            this.sendOk(res, profilePicture);
+        } catch (e) {
+            if (e instanceof Error) return next(ApiError.internal(`getting active profile picture failed: ${e.message}`));
+            return next(ApiError.internal(`getting active profile picture failed: ${e}`));
         }
     };
 }
