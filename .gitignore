@@ -15,4 +15,4 @@ coverage
 docker/volumes/pg-main
 
 # temporary dev files
-tmp/static
+tmp/images

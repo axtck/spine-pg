@@ -7,8 +7,9 @@ if (process.env.NODE_ENV && !Constants.environmentStringValues.includes(process.
 }
 
 if (!process.env.JWT_AUTHKEY) throw new Error("no JWT authkey provided");
-if (!process.env.PROFILE_PICTURES_PATH) throw new Error("no static images path provided");
+if (!process.env.PROFILE_PICTURES_PATH) throw new Error("no profile pictures path provided");
 
+// TODO: has to be Environment enum
 const environement: string = process.env.NODE_ENV || "development";
 export const penv = {
     app: {
@@ -32,7 +33,7 @@ export const penv = {
     static: {
         images: {
             paths: {
-                profilePictures: process.env.PROFILE_PICTURES_PATH
+                profilePictures: environement === "development" ? "tmp/images" : process.env.PROFILE_PICTURES_PATH
             }
         }
     }
