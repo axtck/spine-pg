@@ -31,3 +31,20 @@ INSERT INTO spine.roles ("id", "name")
 VALUES (2, 'admin') ON CONFLICT ("id") DO NOTHING;
 INSERT INTO spine.roles ("id", "name")
 VALUES (3, 'moderator') ON CONFLICT ("id") DO NOTHING;
+-- spine.profile_pictures definition
+CREATE TABLE spine.profile_pictures (
+  "id" serial4 NOT NULL,
+  "user_id" int4 NOT NULL,
+  "active" bool NOT NULL,
+  "filename" varchar(60) NOT NULL,
+  "extension" varchar(5) NOT NULL,
+  "file_location" varchar(200) NOT NULL,
+  "created" timestamp NOT NULL,
+  "modified" timestamp NOT NULL,
+  CONSTRAINT "profile_pictures_pk" PRIMARY KEY ("id"),
+  CONSTRAINT "profile_pictures_un" UNIQUE ("filename"),
+  CONSTRAINT "profile_pictures_un1" UNIQUE ("file_location")
+);
+-- spine.profile_pictures foreign keys
+ALTER TABLE spine.profile_pictures
+ADD CONSTRAINT "profile_pictures_fk" FOREIGN KEY ("user_id") REFERENCES spine.users("id");

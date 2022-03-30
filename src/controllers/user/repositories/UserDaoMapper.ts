@@ -17,7 +17,7 @@ export class UserDaoMapper {
 
     private static isRoles = (roles: string[]): roles is UserRole[] => {
         for (const role of roles) {
-            if (!Constants.userRoles.includes(role as UserRole)) return false;
+            if (!Constants.userRoleStringValues.includes(role)) return false;
         }
 
         return true;
