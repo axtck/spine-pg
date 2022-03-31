@@ -1,13 +1,13 @@
+import { Id } from "./../../types";
 import { Nullable } from "../../types";
 
-export const anyToPositiveNumber = (number: unknown): Nullable<number> => {
+export const toNullableId = (number: unknown): Nullable<Id> => {
     if (parseInt(number as string) >= 0) return parseInt(number as string);
     return null;
 };
 
 export const isOfEnum = <T>(value: unknown, allEnumValues: T[]): value is T => {
-    if (!allEnumValues.includes(value as T)) return false;
-    return true;
+    return allEnumValues.includes(value as T);
 };
 
 export const isOfEnumArray = <T>(values: unknown[], allEnumValues: T[]): values is T[] => {

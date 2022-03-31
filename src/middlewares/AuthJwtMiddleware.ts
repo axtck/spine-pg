@@ -1,3 +1,4 @@
+import { toNullableId } from "./../lib/utils/verification";
 import { UserRole } from "./../controllers/user/types";
 import { Nullable } from "./../types";
 import { ApiError } from "./../lib/errors/ApiError";
@@ -22,16 +23,22 @@ export class AuthJwtMiddleware extends Middleware {
         try {
             const bearer: string | undefined = req.headers.authorization; // full Bearer token
 
-            // validation
+            // validate Bearer token
             if (!bearer) return next(ApiError.forbidden("no authorization token provided"));
             if (!bearer.startsWith("Bearer ")) return next(ApiError.forbidden("authorization token has to start with Bearer"));
 
             const token: string = bearer.slice(7); // slice token from Bearer
             const decoded: string | JwtPayload = jwt.verify(token, penv.auth.jwtAuthkey);
 
-            if (!decoded || typeof decoded === "string") return next(ApiError.internal("decoding token failed"));
+            // validate decoded value
+            if (!decoded) return next(ApiError.internal("decoding token failed, decoded token undefined"));
+            if (typeof decoded === "string") return next(ApiError.internal("decoding token failed, decoded token is not an object"));
+            if (!decoded.sub) return next(ApiError.internal("decoding token failed, decoded token sub value undefined"));
 
-            res.locals.userId = decoded.sub; // pass the decoded sub (id) value to the next middleware
+            const id: Nullable<Id> = toNullableId(decoded.sub);
+            if (!id) return next(ApiError.internal("decoding token failed, decoded token sub value is NaN"));
+
+            req.userId = id; // pass the decoded sub (id) value to the next middleware
             next();
         } catch (e) {
             if (e instanceof Error) return next(ApiError.internal(`token authorization failed: ${e.message}`));
@@ -40,17 +47,15 @@ export class AuthJwtMiddleware extends Middleware {
     };
 
     public isAdmin = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-        const userId: Nullable<Id> = res.locals.userId;
-        if (!userId) return next(ApiError.forbidden("no id in request"));
+        const userId: Id = req.userId;
 
-        const userRoleNames = await this.userService.getUserRoleNames(userId);
+        const userRoleNames: string[] = await this.userService.getUserRoleNames(userId);
         this.authenticateRole(userId, userRoleNames, UserRole.Admin, next);
         next();
     };
 
     public isModerator = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-        const userId: Nullable<Id> = res.locals.userId;
-        if (!userId) return next(ApiError.forbidden("no id in request"));
+        const userId: Id = req.userId;
 
         const userRoleNames: string[] = await this.userService.getUserRoleNames(userId);
         this.authenticateRole(userId, userRoleNames, UserRole.Moderator, next);
