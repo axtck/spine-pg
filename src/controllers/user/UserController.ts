@@ -1,3 +1,4 @@
+import { toNullableId } from "./../../lib/utils/verification";
 import { IProfilePicture } from "./models/ProfilePicture";
 import { profilePicturesMulterUpload } from "./../../lib/files/multer";
 import { ProfilePictureService } from "./services/ProfilePictureService";
@@ -129,7 +130,7 @@ export class UserController extends Controller {
 
     public handleGetUserInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const userId: Id = res.locals.userId;
+            const userId: Id = req.userId;
             const userInfo: Nullable<IUserBase> = await this.userService.getBaseById(userId);
 
             if (!userInfo) return next(ApiError.notFound("no user info found", { user: userId }));
@@ -143,8 +144,8 @@ export class UserController extends Controller {
 
     public handleAddProfilePicture = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const userId: Id = res.locals.userId;
-            if (!req.file) throw new Error("no file provided in request");
+            const userId: Id = req.userId;
+            if (!req.file) return next(ApiError.badRequest("no file provided in request"));
 
             await this.profilePictureService.createProfilePicture(userId, req.file);
             this.sendCreated(res, "profile picture added", { userId: userId });
@@ -156,7 +157,7 @@ export class UserController extends Controller {
 
     public handleGetProfilePictures = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const userId: Id = res.locals.userId;
+            const userId: Id = req.userId;
             const profilePictures: IProfilePicture[] = await this.profilePictureService.getByUserId(userId);
             this.sendOk(res, profilePictures);
         } catch (e) {
@@ -167,7 +168,7 @@ export class UserController extends Controller {
 
     public handleGetProfilePictureById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const id: Nullable<Id> = parseInt(req.params.id) >= 0 ? parseInt(req.params.id) : null;
+            const id: Nullable<Id> = toNullableId(req.params.id);
             if (!id) return next(ApiError.badRequest("no id in request params"));
 
             const profilePicture: Nullable<IProfilePicture> = await this.profilePictureService.getOneById(id);
@@ -182,7 +183,7 @@ export class UserController extends Controller {
 
     public handleGetActiveProfilePicture = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const userId: Id = res.locals.userId;
+            const userId: Id = req.userId;
             const profilePicture: Nullable<IProfilePicture> = await this.profilePictureService.getActiveForUser(userId);
 
             if (!profilePicture) return next(ApiError.notFound("no active profile picture found", { user: userId }));
