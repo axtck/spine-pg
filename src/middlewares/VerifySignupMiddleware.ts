@@ -48,7 +48,7 @@ export class VerifySignupMiddleware extends Middleware {
     };
 
     public checkRolesExisted = (req: Request, res: Response, next: NextFunction): void => {
-        const roleNames: string[] = Constants.userRoleStringValues;
+        const roleNames: string[] = Constants.userRoleEnumValues;
         if (req.body.roles?.length) {
             for (const role of req.body.roles) {
                 if (!roleNames.includes(role)) {

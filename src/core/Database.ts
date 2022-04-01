@@ -1,4 +1,4 @@
-import { createCleanSqlLogString, createSqlLog } from "./../lib/functions/logging";
+import { createCleanSqlLogString, createSqlLog } from "../lib/utils/logging";
 import { createPoolConnection } from "./../lib/database/createConnections";
 import { runMigrations } from "./../lib/database/upgrade";
 import { createDatabaseIfNotExists, createSchemaIfNotExists, createInitialTablesIfNotExists } from "../lib/database/initializeDatabase";

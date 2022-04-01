@@ -1,7 +1,7 @@
 import { ProfilePictureDaoMapper } from "./../repositories/ProfilePictureDaoMapper";
 import { IProfilePicture } from "./../models/ProfilePicture";
 import { IProfilePictureDao } from "./../daos/ProfilePictureDao";
-import { IFileParts, IResizeDimensions } from "./../../../core/services/types";
+import { IFileParts, ImageExtension, IResizeDimensions } from "./../../../core/services/types";
 import { FileService } from "../../../core/services/FileService";
 import { Id, Nullable } from "./../../../types";
 import { Logger } from "./../../../core/Logger";
@@ -10,6 +10,8 @@ import { Service } from "../../../core/Service";
 import { injectable } from "tsyringe";
 import { IInsertProfilePictureData } from "../types";
 import path from "path";
+import { isOfEnum } from "../../../lib/utils/verification";
+import { Constants } from "../../../core/services/Constants";
 
 @injectable()
 export class ProfilePictureService extends Service {
@@ -25,7 +27,7 @@ export class ProfilePictureService extends Service {
     public createProfilePicture = async (userId: Id, file: Express.Multer.File): Promise<void> => {
         // validate file
         const imageExtension: string = path.extname(file.originalname).toLowerCase();
-        if (!this.fileService.isImageExtension(imageExtension)) {
+        if (!isOfEnum<ImageExtension>(imageExtension, Constants.imageExtensionEnumValues)) {
             throw new Error(`bad filetype: ${imageExtension}`);
         }
 

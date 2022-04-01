@@ -19,68 +19,6 @@ export class AuthController extends Controller {
     private readonly userService: UserService;
     private readonly verifySignupMiddleware: VerifySignupMiddleware;
 
-    constructor(logger: Logger,
-        authService: AuthService,
-        userService: UserService,
-        verifySignupMiddleware: VerifySignupMiddleware) {
-        super(logger);
-        this.authService = authService;
-        this.userService = userService;
-        this.verifySignupMiddleware = verifySignupMiddleware;
-    }
-
-    public handleSignup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        try {
-            await this.userService.createUser(req.body.username, req.body.email, req.body.password);
-            await this.userService.assignRoles(req.body.username, req.body.roles);
-
-            this.sendCreated(res, "user succesfully created", { username: req.body.username });
-        } catch (e) {
-            if (e instanceof Error) {
-                next(ApiError.internal(`signup failed: ${e.message}`));
-                return;
-            }
-            next(ApiError.internal(`signup failed: ${e}`));
-            return;
-        }
-    };
-
-    public handleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        try {
-            const user: Nullable<IUserCredentials> = await this.userService.getUserByUsername(req.body.username);
-            if (!user) {
-                next(ApiError.unauthorized("user not found", { username: req.body.username }));
-                return;
-            }
-
-            const passwordIsValid: boolean = this.authService.validatePassword(req.body.password, user.password);
-            if (!passwordIsValid) {
-                next(ApiError.unauthorized("invalid password attempt", { username: req.body.username }));
-                return;
-            }
-
-            const token: string = this.authService.signToken(user.id, penv.auth.jwtAuthkey);
-            const userRoles: string[] = await this.userService.getUserRoleNames(user.id);
-
-            const loginResponse: ILoginResponse = {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                roles: userRoles,
-                accessToken: token
-            };
-
-            this.sendOk(res, loginResponse, "user successfully logged in");
-        } catch (e) {
-            if (e instanceof Error) {
-                next(ApiError.internal(`login failed: ${e.message}`));
-                return;
-            }
-            next(ApiError.internal(`login failed: ${e}`));
-            return;
-        }
-    };
-
     protected get routes(): IControllerRoute[] {
         const routes: IControllerRoute[] = [
             {
@@ -104,4 +42,52 @@ export class AuthController extends Controller {
 
         return routes;
     }
+
+    constructor(logger: Logger,
+        authService: AuthService,
+        userService: UserService,
+        verifySignupMiddleware: VerifySignupMiddleware) {
+        super(logger);
+        this.authService = authService;
+        this.userService = userService;
+        this.verifySignupMiddleware = verifySignupMiddleware;
+    }
+
+    public handleSignup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            await this.userService.createUser(req.body.username, req.body.email, req.body.password);
+            await this.userService.assignRoles(req.body.username, req.body.roles);
+
+            this.sendCreated(res, "user succesfully created", { username: req.body.username });
+        } catch (e) {
+            if (e instanceof Error) return next(ApiError.internal(`signup failed: ${e.message}`));
+            return next(ApiError.internal(`signup failed: ${e}`));
+        }
+    };
+
+    public handleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const user: Nullable<IUserCredentials> = await this.userService.getUserByUsername(req.body.username);
+            if (!user) return next(ApiError.unauthorized("user not found", { username: req.body.username }));
+
+            const passwordIsValid: boolean = this.authService.validatePassword(req.body.password, user.password);
+            if (!passwordIsValid) return next(ApiError.unauthorized("invalid password attempt", { username: req.body.username }));
+
+            const token: string = this.authService.signToken(user.id, penv.auth.jwtAuthkey);
+            const userRoles: string[] = await this.userService.getUserRoleNames(user.id);
+
+            const loginResponse: ILoginResponse = {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                roles: userRoles,
+                accessToken: token
+            };
+
+            this.sendOk(res, loginResponse, "user successfully logged in");
+        } catch (e) {
+            if (e instanceof Error) return next(ApiError.internal(`login failed: ${e.message}`));
+            return next(ApiError.internal(`login failed: ${e}`));
+        }
+    };
 }

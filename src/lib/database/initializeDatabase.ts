@@ -2,12 +2,12 @@ import { Database } from "./../../core/Database";
 import { QueryString } from "./../../types";
 import { container } from "tsyringe";
 import { createPoolConnectionWithoutDatabase } from "./createConnections";
-import { lazyHandleException } from "../functions/exceptionHandling";
+import { lazyHandleException } from "../utils/exceptionHandling";
 import { Logger } from "../../core/Logger";
 import { Pool, QueryResult } from "pg";
 import { executeSqlFromFile } from "./executeFromSql";
 import { penv } from "../../config/penv";
-import path from "path";
+import { buildPathFromRoot } from "../utils/paths";
 
 export const createDatabaseIfNotExists = async (): Promise<void> => {
     const logger: Logger = container.resolve(Logger);
@@ -62,7 +62,7 @@ export const createInitialTablesIfNotExists = async (): Promise<void> => {
             return;
         }
 
-        const sqlFilePath: string = path.join(__dirname, "..", "..", "..", "database", "createInitialTables.sql");
+        const sqlFilePath: string = buildPathFromRoot("database", "createInitialTables.sql");
         await executeSqlFromFile(sqlFilePath);
         const existingTablesAfterInsert: Array<{ name: string; }> = await database.query(getTableNamesQuery);
         logger.info(`tables '${existingTablesAfterInsert.map((t) => t.name).join(", ")}' successfully created`);

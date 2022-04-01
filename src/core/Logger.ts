@@ -3,8 +3,8 @@ import { LogMessageTypes } from "./types";
 import { penv } from "../config/penv";
 import { Constants } from "../Constants";
 import { injectable } from "tsyringe";
+import { buildPathFromRoot } from "../lib/utils/paths";
 import winston from "winston";
-import path from "path";
 
 @injectable()
 export class Logger {
@@ -31,10 +31,10 @@ export class Logger {
     private readonly transports = [
         new winston.transports.Console(),
         new winston.transports.File({
-            filename: path.join(".", "log", "error.log"),
+            filename: buildPathFromRoot("log", "error.log"),
             level: "error"
         }),
-        new winston.transports.File({ filename: path.join(".", "log", "all.log") })
+        new winston.transports.File({ filename: buildPathFromRoot("log", "all.log") })
     ];
 
     private readonly logger: winston.Logger = winston.createLogger({
