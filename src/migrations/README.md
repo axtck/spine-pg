@@ -1,9 +1,11 @@
-# Migrations 
+# Migrations
 
-***Migrations folder***
+**_Migrations folder_**
+
+---
+
+This `README` is here so the folder is not empty when cloning.
 
 ---
 
-Read more about how to create a migration in the [README](https://code.visualstudio.com/)
-
----
+To create a migration, run `npm run migration:create -- --name something`
