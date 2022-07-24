@@ -1,34 +1,30 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Launch Server",
-            "type": "pwa-node",
-            "program": "${workspaceFolder}/src/server.ts",
-            "request": "launch",
-            "console": "integratedTerminal",
-            "smartStep": true,
-            "sourceMaps": true,
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        },
-        {
-            "name": "Debug current test",
-            "type": "pwa-node",
-            "program": "${workspaceFolder}/node_modules/jest/bin/jest",
-            "request": "launch",
-            "args": [
-                "${fileBasename}",
-                "--config",
-                "jest.config.js",
-                "--outputFile",
-                "${fileDirname}${pathSeparator}${fileBasenameNoExtension}.output.json"
-            ],
-            "console": "integratedTerminal",
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Server",
+      "type": "node",
+      "program": "${workspaceFolder}/src/server.ts",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "smartStep": true,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Debug current test",
+      "type": "node",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest",
+      "request": "launch",
+      "args": [
+        "${fileBasename}",
+        "--config",
+        "jest.config.js",
+        "--outputFile",
+        "${fileDirname}${pathSeparator}${fileBasenameNoExtension}.output.json"
+      ],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
 }

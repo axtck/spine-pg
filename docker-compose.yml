@@ -12,7 +12,7 @@ services:
       - PGDATA=/var/lib/postgresql/data/pgdata
     healthcheck:
       # checks if database is ready
-      test: [ "CMD-SHELL", "pg_isready -U ${PG_USER}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER}"]
       timeout: 20s
       retries: 5
     ports:
@@ -36,9 +36,9 @@ services:
       - .env # use env file for environment variables
     environment:
       # overwrite container specific environment variables separately
-      - HOST_SERVER_PORT=${COMPOSE_SERVER_PORT} # docker is host inside docker env 
-      - PG_HOST=pg-main # pg-main (db) container is pg host inside docker env 
-      - PG_PORT=5432 # port is 5432 inside docker env 
+      - HOST_SERVER_PORT=${COMPOSE_SERVER_PORT} # docker is host inside docker env
+      - PG_HOST=pg-main # pg-main (db) container is pg host inside docker env
+      - PG_PORT=5432 # port is 5432 inside docker env
     ports:
       - ${HOST_SERVER_PORT}:${COMPOSE_SERVER_PORT} # map to outside container
     stdin_open: true
