@@ -1,7 +1,7 @@
-# Temporary folder 
+# Temporary folder
 
-***Temporary dev files***
+Temporary dev files
 
 ---
 
-Created this ```README``` so the folder is not empty when cloning.
+This `README` is here so the folder is not empty when cloning.

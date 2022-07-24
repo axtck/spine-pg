@@ -1,6 +1,6 @@
 # Migrations
 
-**_Migrations folder_**
+Migrations folder
 
 ---
 
