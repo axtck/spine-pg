@@ -1,8 +1,4 @@
-# Spine-pg
-
-Spine with Postgres
-
----
+# Spine
 
 ## Development
 
