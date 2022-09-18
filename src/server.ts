@@ -15,6 +15,7 @@ import cors from "cors";
 import { UserController } from "./controllers/UserController";
 import { AuthController } from "./controllers/AuthController";
 import { ApiErrorHandler } from "./middlewares/ApiErrorHandler";
+import path from "path";
 
 const app: Application = express();
 const logger: Logger = container.resolve(Logger);
@@ -33,9 +34,10 @@ const globalMiddleWares: RequestHandler[] = [
 const authController: AuthController = container.resolve(AuthController);
 const userController: UserController = container.resolve(UserController);
 const controllers: Controller[] = [authController, userController];
+const migrationsFolderPath: string = path.join(__dirname, "migrations"); // at runtime, this will point to dist/migrations
 
 server
-  .initDatabase(buildPathFromRoot("src", "migrations"))
+  .initDatabase(buildPathFromRoot(migrationsFolderPath))
   .then(() => {
     server.listEnv();
     server.loadGlobalMiddlewares(globalMiddleWares);
